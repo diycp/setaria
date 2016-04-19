@@ -1,0 +1,12 @@
+project(':core') {
+
+    dependencies {
+        provided 'javax.servlet:javax.servlet-api:3.1.0'
+
+        compile('org.apache.curator:curator-framework:2.9.1') {
+            exclude group: 'log4j', module: 'log4j'
+            exclude group: 'jline', module: 'jline'
+            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        }
+    }
+}

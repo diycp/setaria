@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url 'http://repo.spring.io/plugins-release' }
+        maven { url 'https://plugins.gradle.org/m2' }
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+    }
+}
+
+allprojects {
+
+    repositories {
+        mavenLocal();
+        mavenCentral()
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'propdeps'
+    apply plugin: 'propdeps-maven'
+    apply plugin: 'propdeps-idea'
+
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+
+    group = 'com.weghst.setaria'
+    version = '1.0-SNAPSHOT'
+
+    ext.slf4jVersion = '1.7.12'
+    ext.testngVersion = '6.9.6'
+    ext.springVersion = '4.2.3.RELEASE'
+}
+
+subprojects {
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    configurations {
+        compile.exclude group: 'commons-logging', module: 'commons-logging'
+    }
+
+    jar {
+        baseName = "$rootProject.name-$project.name"
+    }
+
+    dependencies {
+        compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+        testCompile("org.testng:testng:$testngVersion") {
+            exclude module: 'guice'
+            exclude module: 'junit'
+            exclude module: 'ant'
+        }
+    }
+}
