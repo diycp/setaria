@@ -67,6 +67,7 @@ public class AppServiceImpl implements AppService {
             }
             for (int i = 0; i < 10; i++) {
                 stat = curatorFramework.setData().forPath(buildPath(app), ("test" + i).getBytes());
+                // Thread.sleep(1 * 1000);
             }
             System.out.println(stat);
 
