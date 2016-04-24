@@ -1,5 +1,6 @@
 rootProject.name = 'setaria'
 
+include ':client'
+
 include ':core'
-include ':center'
 include ':console'

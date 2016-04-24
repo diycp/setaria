@@ -1,0 +1,21 @@
+project(':client') {
+
+    dependencies {
+        provided 'javax.servlet:javax.servlet-api:3.1.0'
+
+        compile 'org.springframework:spring-core:3.2.16.RELEASE'
+        compile 'org.springframework:spring-beans:3.2.16.RELEASE'
+        compile 'org.springframework:spring-context:3.2.16.RELEASE'
+
+        // 分布式配置依赖
+        compile 'com.squareup.okhttp:okhttp:2.7.5'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.6.5'
+        compile('org.apache.zookeeper:zookeeper:3.4.8') {
+            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+            exclude group: 'log4j', module: 'log4j'
+            exclude group: 'jline', module: 'jline'
+        }
+
+        testCompile 'org.springframework:spring-test:3.2.16.RELEASE'
+    }
+}

@@ -48,31 +48,8 @@
           p:poolPreparedStatements="${druid.poolPreparedStatements}"
           p:maxPoolPreparedStatementPerConnectionSize="${druid.maxPoolPreparedStatementPerConnectionSize}"/>
 
-    <bean id="slaveDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"
-          p:url="${slave.jdbc.url}"
-          p:username="${slave.jdbc.username}"
-          p:password="${slave.jdbc.password}"
-          p:initialSize="${slave.druid.initialSize}"
-          p:minIdle="${slave.druid.minIdle}"
-          p:maxActive="${slave.druid.maxActive}"
-          p:maxWait="${slave.druid.maxWait}"
-          p:timeBetweenEvictionRunsMillis="${slave.druid.timeBetweenEvictionRunsMillis}"
-          p:minEvictableIdleTimeMillis="${slave.druid.minEvictableIdleTimeMillis}"
-          p:validationQuery="${slave.druid.validationQuery}"
-          p:poolPreparedStatements="${slave.druid.poolPreparedStatements}"
-          p:maxPoolPreparedStatementPerConnectionSize="${slave.druid.maxPoolPreparedStatementPerConnectionSize}"/>
-
-    <bean id="complexDataSource" class="com.weghst.pine.complexds.ComplexDataSource">
-        <constructor-arg index="0" ref="dataSource"/>
-        <constructor-arg index="1">
-            <map>
-                <entry key="#{T(com.weghst.pine.complexds.NamedDS).DEFAULT_SLAVE_NAME}" value-ref="slaveDataSource"/>
-            </map>
-        </constructor-arg>
-    </bean>
-
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-          p:dataSource-ref="complexDataSource"/>
+          p:dataSource-ref="dataSource"/>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
@@ -80,45 +57,33 @@
         MyBatis 配置
     -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="complexDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
         <property name="configurationProperties">
             <props>
                 <prop key="defaultScriptingLanguage">org.mybatis.scripting.freemarker.FreeMarkerLanguageDriver</prop>
             </props>
         </property>
-        <property name="mapperLocations" value="classpath*:com/weghst/pine/repository/*Mapper.xml"/>
+        <property name="mapperLocations" value="classpath*:com/weghst/setaria/core/repository/*Mapper.xml"/>
     </bean>
-    <bean id="sqlSessionTemplate" class="com.weghst.pine.util.FastSqlSessionTemplate"
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
           c:sqlSessionFactory-ref="sqlSessionFactory"/>
 
-    <!--
-        Redis 服务配置示例暂时没有实际应用
-    -->
-    <util:map id="redisSentinelConfiguration">
-        <entry key="spring.redis.sentinel.master" value="myMaster"/>
-        <entry key="spring.redis.sentinel.nodes" value="127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681"/>
-    </util:map>
-    <bean id="jedisConnFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-          p:hostName="localhost"
-          p:port="6379"
-          p:usePool="true"/>
-
-    <import resource="classpath*:/spring-pine-core.xml"/>
-
-    <bean id="mailSender" class="com.weghst.pine.service.JavaMailSenderFactoryBean"
-          p:host="smtp.mxhichina.com"
-          p:port="25"
-          p:username="noreplay@weghst.com"
-          p:password="njSzbjie0+"/>
 
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!-- +++++++++++++++                   Web Config                    +++++++++++++++ -->
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <mvc:annotation-driven/>
 
-    <bean id="viewObjectMapper" class="com.weghst.pine.web.ViewObjectMapperFactory" factory-method="getObjectMapper"/>
+    <bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+          p:serializationInclusion="NON_NULL"
+    />
 
-    <bean id="sessionRepository" class="org.springframework.session.data.redis.RedisOperationsSessionRepository"
-          c:redisConnectionFactory-ref="jedisConnFactory"/>
+    <mvc:freemarker-configurer>
+        <mvc:template-loader-path location="WEB-INF/templates"/>
+    </mvc:freemarker-configurer>
+
+    <mvc:view-resolvers>
+        <mvc:freemarker cache-views="true" suffix=".ftl"/>
+    </mvc:view-resolvers>
 
 </beans>

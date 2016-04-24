@@ -18,6 +18,9 @@ allprojects {
         mavenCentral()
     }
 
+    group = 'com.weghst.setaria'
+    version = '1.0-SNAPSHOT'
+
     apply plugin: 'java'
     apply plugin: 'propdeps'
     apply plugin: 'propdeps-maven'
@@ -25,9 +28,6 @@ allprojects {
 
     apply plugin: 'maven'
     apply plugin: 'idea'
-
-    group = 'com.weghst.setaria'
-    version = '1.0-SNAPSHOT'
 
     ext.slf4jVersion = '1.7.12'
     ext.testngVersion = '6.9.6'
@@ -42,7 +42,7 @@ subprojects {
     [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
     configurations {
-        compile.exclude group: 'commons-logging', module: 'commons-logging'
+        // compile.exclude group: 'commons-logging', module: 'commons-logging'
     }
 
     jar {
