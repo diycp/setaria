@@ -23,16 +23,15 @@
        xmlns:c="http://www.springframework.org/schema/c"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.weghst.pine"/>
+    <context:component-scan base-package="com.weghst.setaria"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" p:systemPropertiesMode="1"/>
+    <context:property-placeholder location="classpath:setaria.properties"/>
+    <context:property-placeholder location="~/.setaria/setaria.properties" ignore-resource-not-found="true"/>
 
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"
           p:url="${jdbc.url}"
@@ -74,16 +73,16 @@
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <mvc:annotation-driven/>
 
-    <bean id="objectMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
-          p:serializationInclusion="NON_NULL"
-    />
+    <!-- freemarker config -->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="templateLoaderPath" value="/WEB-INF/templates"/>
+    </bean>
 
-    <mvc:freemarker-configurer>
-        <mvc:template-loader-path location="WEB-INF/templates"/>
-    </mvc:freemarker-configurer>
-
-    <mvc:view-resolvers>
-        <mvc:freemarker cache-views="true" suffix=".ftl"/>
-    </mvc:view-resolvers>
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="suffix" value=".ftl"/>
+        <property name="contentType" value="text/html; charset=UTF-8"/>
+        <property name="requestContextAttribute" value="rc"/>
+    </bean>
 
 </beans>
