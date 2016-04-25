@@ -16,8 +16,7 @@ public class AdminController {
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public ModelAndView index() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("dashboard");
+        ModelAndView mav = new ModelAndView("dashboard");
         return mav;
     }
 }

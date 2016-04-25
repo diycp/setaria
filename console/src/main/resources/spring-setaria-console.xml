@@ -34,9 +34,9 @@
     <context:property-placeholder location="~/.setaria/setaria.properties" ignore-resource-not-found="true"/>
 
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"
-          p:url="${jdbc.url}"
-          p:username="${jdbc.username}"
-          p:password="${jdbc.password}"
+          p:url="${druid.url}"
+          p:username="${druid.username}"
+          p:password="${druid.password}"
           p:initialSize="${druid.initialSize}"
           p:minIdle="${druid.minIdle}"
           p:maxActive="${druid.maxActive}"
