@@ -8,6 +8,7 @@
     <!-- 基础库 -->
     <script src="js/jquery.min.js"></script>
     <script src="js/angular.min.js"></script>
+    <script src="js/angular-ui-router.min.js"></script>
     <script src="js/ocLazyLoad.min.js"></script>
 
     <!-- Amaze UI 基础 -->
@@ -21,7 +22,21 @@
     <script src="amaze-ui/plugins/datatables/dataTables.responsive.min.js"></script>
 
     <script>
-        var app = angular.module('SetariaConsoleApp', ['oc.lazyLoad']);
+        var app = angular.module('SetariaConsoleApp', ['ui.router', 'oc.lazyLoad']).config(function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/');
+            $stateProvider
+                    .state('home', {url: '/', templateUrl: 'p/view?v=summary'})
+                    .state('users', {url: '/users', templateUrl: 'p/view?v=user-list'})
+                    .state('configs', {abstract: true, url: '/configs', templateUrl: 'p/view?v=config-list'})
+                    .state('configs.app', {
+                        url: '/:appId', views: {
+                            '': {
+                                templateUrl: 'p/view?v=user-list'
+                            }
+                        }
+                    })
+            ;
+        });
     </script>
 </head>
 <body>
@@ -51,17 +66,17 @@
     <!-- sidebar start -->
     <div class="admin-sidebar am-offcanvas">
         <ul class="am-list admin-sidebar-list">
-            <li><a href="admin-index.html"><span class="am-icon-dashboard"></span> 首页</a></li>
+            <li><a ui-sref="home"><span class="am-icon-dashboard"></span> 首页</a></li>
             <li>
-                <a><span class="am-icon-users"></span> 用户管理</a>
+                <a ui-sref="users"><span class="am-icon-users"></span> 用户管理</a>
             </li>
             <li class="am-panel">
-                <a data-am-collapse="{target: '#config-manager-nav'}">
+                <a ui-sref="configs" data-am-collapse="{target: '#config-manager-nav'}">
                     <i class="am-icon-database"></i> 配置管理 <span
                         class="am-icon-angle-right am-fr am-margin-right"></span>
                 </a>
                 <ul class="am-list am-collapse admin-sidebar-sub" id="config-manager-nav">
-                    <li><a href="admin-user.html" class="am-cf"> 统一登录</a></li>
+                    <li><a ui-sref="configs.app({appId:555})" class="am-cf"> 统一登录</a></li>
                 </ul>
             </li>
         </ul>
@@ -71,7 +86,7 @@
     <!-- content start -->
     <div class="admin-content">
         <div class="admin-content-body">
-            <div class="am-cf am-padding">
+            <div class="am-cf am-padding" ui-view>
                 <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">首页</strong> /
                     <small>一些常用模块</small>
                 </div>

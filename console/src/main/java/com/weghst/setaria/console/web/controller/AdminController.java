@@ -10,12 +10,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 @Controller
-@RequestMapping("/admin")
 @EnableWebMvc
 public class AdminController {
 
-    @RequestMapping(value = "/index", method = RequestMethod.GET)
-    public ModelAndView index() {
+    @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
+    public ModelAndView dashboard() {
         ModelAndView mav = new ModelAndView("dashboard");
         return mav;
     }
