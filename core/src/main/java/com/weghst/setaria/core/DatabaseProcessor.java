@@ -16,10 +16,6 @@ import javax.sql.DataSource;
 public class DatabaseProcessor implements BeanPostProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseProcessor.class);
-    /**
-     * DatabaseProcessor 被 Ioc 容器所管理的 ID。
-     */
-    public static final String BEAN_NAME = "com.weghst.setaria.core.DatabaseProcessor";
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -28,7 +24,7 @@ public class DatabaseProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof DataSource) {
+        if ("dataSource".equals(beanName)) {
             upgradeDatabase((DataSource) bean);
         }
         return bean;
