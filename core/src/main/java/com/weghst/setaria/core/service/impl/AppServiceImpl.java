@@ -1,8 +1,10 @@
 package com.weghst.setaria.core.service.impl;
 
-import com.weghst.setaria.core.domain.App;
-import com.weghst.setaria.core.domain.Env;
-import com.weghst.setaria.core.service.AppService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.RetrySleeper;
 import org.apache.curator.framework.CuratorFramework;
@@ -12,26 +14,33 @@ import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.weghst.setaria.core.domain.App;
+import com.weghst.setaria.core.domain.User;
+import com.weghst.setaria.core.domain.UserApp;
+import com.weghst.setaria.core.repository.AppRepository;
+import com.weghst.setaria.core.repository.UserAppRepository;
+import com.weghst.setaria.core.repository.UserRepository;
+import com.weghst.setaria.core.service.AppService;
 
 /**
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
+@Transactional
 @Service
 public class AppServiceImpl implements AppService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AppServiceImpl.class);
 
-    public static void main(String[] args) {
-        AppServiceImpl appService = new AppServiceImpl();
-        App app = new App();
-        app.setName("pine");
-        app.setEnv(Env.developer);
-
-        appService.inform(app);
-    }
+    @Autowired
+    private AppRepository appRepository;
+    @Autowired
+    private UserAppRepository userAppRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public boolean inform(App app) {
@@ -80,9 +89,100 @@ public class AppServiceImpl implements AppService {
         return false;
     }
 
+    @Override
+    public void save(App app) {
+        app.setCreatedTime(System.currentTimeMillis());
+        appRepository.save(app);
+    }
+
+    @Override
+    public void save(App app, int[] userIds) {
+        save(app);
+        saveUserApps(app.getId(), userIds);
+    }
+
+    @Override
+    public void update(App app) {
+        app.setLastUpdatedTime(System.currentTimeMillis());
+        appRepository.update(app);
+    }
+
+    @Override
+    public void update(App app, int[] userIds) {
+        update(app);
+
+        // 更新 APP 所属用户
+        int[] dbUserIds = findAppUserIds(app.getId());
+        int[] addUserIds = ArrayUtils.removeElements(userIds, dbUserIds);
+        int[] deleteUserIds = ArrayUtils.removeElements(dbUserIds, userIds);
+
+        saveUserApps(app.getId(), addUserIds);
+        if (deleteUserIds.length > 0) {
+            userAppRepository.deleteAppUsers(app.getId(), deleteUserIds);
+        }
+    }
+
+    @Override
+    public void deleteById(int id) {
+        appRepository.deleteById(id);
+        userAppRepository.deleteByAppId(id);
+        // 删除 t_config 参数配置
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public App findById(int id) {
+        return appRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<App> findAppsByUserId(int userId) {
+        return appRepository.findAppsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<App> findAppsByUserIdOrRole(int userId) {
+        User user = userRepository.findById(userId);
+        if (user.isManager()) {
+            return findAll();
+        }
+        return findAppsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public int[] findAppUserIds(int appId) {
+        List<Integer> list = userAppRepository.findAppUserIds(appId);
+        return ArrayUtils.toPrimitive(list.toArray(ArrayUtils.EMPTY_INTEGER_OBJECT_ARRAY));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<App> findAll() {
+        return appRepository.findAll();
+    }
+
+    // FIXME
     private String buildPath(App app) {
         StringBuilder sb = new StringBuilder("/com/weghst/setaria/");
         sb.append(app.getName()).append("/").append(app.getEnv());
         return sb.toString();
+    }
+
+    private void saveUserApps(int appId, int[] userIds) {
+        if (userIds.length == 0) {
+            return;
+        }
+
+        List<UserApp> userApps = new ArrayList<>();
+        for (int userId : userIds) {
+            UserApp userApp = new UserApp();
+            userApp.setUserId(userId);
+            userApp.setAppId(appId);
+            userApps.add(userApp);
+        }
+        userAppRepository.saveUserApps(userApps);
     }
 }

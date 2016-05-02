@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weghst.setaria.core.repository.UserAppRepository">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user_app(userId,appId) VALUES(#{appId}, #{userId})
+    </insert>
+
+    <insert id="saveUserApps">
+        INSERT INTO t_user_app(userId,appId) VALUES
+        <foreach collection="list" item="obj" separator=",">
+            (#{obj.userId}, #{obj.appId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByUserId">
+        DELETE FROM t_user_app WHERE userId=#{value}
+    </delete>
+
+    <delete id="deleteByAppId">
+        DELETE FROM t_user_app WHERE appId=#{value}
+    </delete>
+
+    <delete id="deleteUserApps">
+        DELETE FROM t_user_app WHERE userId=#{userId} AND appId IN (
+        <foreach collection="appIds" item="obj" separator=",">
+            #{obj}
+        </foreach>
+        )
+    </delete>
+
+    <delete id="deleteAppUsers">
+        DELETE FROM t_user_app WHERE appId=#{appId} AND userId IN (
+        <foreach collection="userIds" item="obj" separator=",">
+            #{obj}
+        </foreach>
+        )
+    </delete>
+
+    <select id="findUserAppIds" resultType="int">
+        SELECT appId FROM t_user_app WHERE userId=#{value}
+    </select>
+
+    <select id="findAppUserIds" resultType="int">
+        SELECT userId FROM t_user_app WHERE appId=#{value}
+    </select>
+
+</mapper>

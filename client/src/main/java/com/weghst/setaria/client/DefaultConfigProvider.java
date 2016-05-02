@@ -1,11 +1,12 @@
 package com.weghst.setaria.client;
 
-import com.weghst.setaria.client.converter.*;
-import org.springframework.util.PropertyPlaceholderHelper;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Properties;
+
+import org.springframework.util.PropertyPlaceholderHelper;
+
+import com.weghst.setaria.client.converter.*;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)

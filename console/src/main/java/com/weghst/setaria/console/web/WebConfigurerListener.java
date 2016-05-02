@@ -1,16 +1,17 @@
 package com.weghst.setaria.console.web;
 
-import ch.qos.logback.ext.spring.web.WebLogbackConfigurer;
+import java.io.File;
+import java.util.EnumSet;
+import javax.servlet.*;
+import javax.servlet.annotation.WebListener;
+
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebListener;
-import java.io.File;
-import java.util.EnumSet;
+import ch.qos.logback.ext.spring.web.WebLogbackConfigurer;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)

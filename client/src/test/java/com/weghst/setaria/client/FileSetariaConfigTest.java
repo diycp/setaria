@@ -1,15 +1,5 @@
 package com.weghst.setaria.client;
 
-import com.weghst.setaria.client.annotation.ConfigValue;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +9,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.testng.Assert.assertEquals;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+import com.weghst.setaria.client.annotation.ConfigValue;
+
+import static org.testng.Assert.*;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)

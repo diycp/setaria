@@ -3,15 +3,38 @@ package com.weghst.setaria.core.domain;
 import java.io.Serializable;
 
 /**
+ * 应用实体类型.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 public class App implements Serializable {
 
+    private static final long serialVersionUID = 8712744054066753289L;
+
+    /**
+     * 主键.
+     */
     private int id;
+    /**
+     * 应用名称.
+     */
     private String name;
+    /**
+     * 应用环境.
+     */
     private Env env;
+    /**
+     * 创建时间.
+     */
     private long createdTime;
+    /**
+     * 最后修改时间.
+     */
     private long lastUpdatedTime;
+    /**
+     * 应用描述.
+     */
+    private String description;
 
     public int getId() {
         return id;
@@ -53,6 +76,14 @@ public class App implements Serializable {
         this.lastUpdatedTime = lastUpdatedTime;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "App{" +
@@ -61,6 +92,7 @@ public class App implements Serializable {
                 ", env=" + env +
                 ", createdTime=" + createdTime +
                 ", lastUpdatedTime=" + lastUpdatedTime +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

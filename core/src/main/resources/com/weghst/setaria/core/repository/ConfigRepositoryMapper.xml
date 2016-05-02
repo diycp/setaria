@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weghst.setaria.core.repository.ConfigRepository">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_config(appId, `key`, `value`, description, createdTime)
+         VALUES(#{appId}, #{key}, #{value}, #{description}, #{createdTime})
+    </insert>
+
+    <update id="update">
+        UPDATE t_config SET `key`=#{key}, `value`=#{value}, description=#{description}, lastUpdatedTime=#{lastUpdatedTime}
+         WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_config WHERE id=#{value}
+    </delete>
+
+    <select id="findById" resultType="com.weghst.setaria.core.domain.Config">
+        SELECT * FROM t_config WHERE id=#{value}
+    </select>
+
+    <select id="findByAppId" resultType="com.weghst.setaria.core.domain.Config">
+        SELECT * FROM t_config WHERE appId=#{value}
+    </select>
+
+</mapper>

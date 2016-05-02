@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weghst.setaria.core.repository.ConfigChangedHistoryRepository">
+
+    <insert id="save">
+        INSERT INTO t_config_changed_history(appName, appEnv, configId, action, operator, original, changed, createdTime)
+         VALUES(#{appName}, #{appEnv}, #{configId}, #{action}, #{operator}, #{original}, #{changed}, #{createdTime})
+    </insert>
+
+</mapper>

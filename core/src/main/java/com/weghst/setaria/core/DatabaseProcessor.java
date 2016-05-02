@@ -1,13 +1,13 @@
 package com.weghst.setaria.core;
 
+import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)

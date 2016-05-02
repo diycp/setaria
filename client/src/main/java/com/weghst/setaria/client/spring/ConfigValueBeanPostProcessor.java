@@ -1,10 +1,10 @@
 package com.weghst.setaria.client.spring;
 
-import com.weghst.setaria.client.Configs;
-import com.weghst.setaria.client.SetariaConfig;
-import com.weghst.setaria.client.SetariaConfigContext;
-import com.weghst.setaria.client.SetariaConfigListener;
-import com.weghst.setaria.client.annotation.ConfigValue;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -20,10 +20,11 @@ import org.springframework.core.env.PropertySources;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import com.weghst.setaria.client.Configs;
+import com.weghst.setaria.client.SetariaConfig;
+import com.weghst.setaria.client.SetariaConfigContext;
+import com.weghst.setaria.client.SetariaConfigListener;
+import com.weghst.setaria.client.annotation.ConfigValue;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)

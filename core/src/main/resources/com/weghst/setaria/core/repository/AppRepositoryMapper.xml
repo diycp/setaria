@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weghst.setaria.core.repository.AppRepository">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_app(name,env,description,createdTime) VALUES(#{name}, #{env}, #{description}, #{createdTime})
+    </insert>
+
+    <update id="update">
+        UPDATE t_app SET name=#{name}, env=#{env}, description=#{description}, lastUpdatedTime=#{lastUpdatedTime}
+         WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_app WHERE id=#{value}
+    </delete>
+
+    <select id="findById" resultType="com.weghst.setaria.core.domain.App">
+        SELECT * FROM t_app WHERE id=#{value}
+    </select>
+
+    <select id="findAppsByUserId" resultType="com.weghst.setaria.core.domain.App">
+        SELECT * FROM t_app WHERE id IN (SELECT appId FROM t_user_app WHERE userId=#{value}) ORDER BY id DESC
+    </select>
+
+    <select id="findAll" resultType="com.weghst.setaria.core.domain.App">
+        SELECT * FROM t_app ORDER BY id DESC
+    </select>
+
+</mapper>

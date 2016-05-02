@@ -42,7 +42,7 @@ subprojects {
     [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
     configurations {
-        // compile.exclude group: 'commons-logging', module: 'commons-logging'
+        compile.exclude group: 'commons-logging', module: 'commons-logging'
     }
 
     jar {
@@ -51,6 +51,7 @@ subprojects {
 
     dependencies {
         compile "org.slf4j:slf4j-api:$slf4jVersion"
+        compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
 
         testCompile("org.testng:testng:$testngVersion") {
             exclude module: 'guice'

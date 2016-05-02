@@ -5,10 +5,11 @@ package com.weghst.setaria.core;
  *
  * @author Kevin Zou (kevinz@weghst.com)
  */
-public interface Constants {
+public class Constants {
 
     /**
-     * 自动升级数据库属性键。
+     *
      */
-    String AUTO_UPGRADE_DATABASE = "setaria.autoUpgradeDatabase";
+    public static String ROOT_USER;
+
 }

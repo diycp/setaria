@@ -64,8 +64,14 @@
         </property>
         <property name="mapperLocations" value="classpath*:com/weghst/setaria/core/repository/*Mapper.xml"/>
     </bean>
+
     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
           c:sqlSessionFactory-ref="sqlSessionFactory"/>
+
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+          p:basePackage="com.weghst.setaria.core.repository"
+          p:annotationClass="org.springframework.stereotype.Repository"
+          p:sqlSessionTemplateBeanName="sqlSessionTemplate"/>
 
 
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -73,10 +79,24 @@
     <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <mvc:annotation-driven/>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--<mvc:mapping path="/*"/>-->
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/**/login*"/>
+            <bean class="com.weghst.setaria.console.web.LoginValidatingInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
     <!-- freemarker config -->
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
         <property name="defaultEncoding" value="UTF-8"/>
         <property name="templateLoaderPath" value="/WEB-INF/templates"/>
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="rootUser" value="${setaria.root}"/>
+            </map>
+        </property>
     </bean>
 
     <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">

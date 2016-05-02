@@ -1,20 +1,22 @@
 package com.weghst.setaria.core.domain;
 
 /**
+ * 应用环境枚举类型.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 public enum Env {
 
     /**
-     *
+     * 生产环境.
      */
     production(1),
     /**
-     *
+     * 测试环境.
      */
     test(2),
     /**
-     *
+     * 开发环境.
      */
     developer(3);
 
@@ -25,19 +27,22 @@ public enum Env {
     }
 
     /**
+     * 应用环境数字编码.
      *
-     * @return
+     * @return 数字编码
      */
     public int getCode() {
         return code;
     }
 
     /**
+     * 转换数字编码为枚举类型.
      *
-     * @param code
-     * @return
+     * @param code 数字编码
+     * @return 枚举类型
+     * @throws IllegalArgumentException 如果编码不存在对应的枚举
      */
-    public static Env fromCode(int code) {
+    public static Env fromCode(int code) throws IllegalArgumentException {
         for (Env e : Env.values()) {
             if (e.code == code) {
                 return e;
