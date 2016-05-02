@@ -12,6 +12,7 @@ public class UserVo {
     private int id;
     private String email;
     private String password;
+    private boolean manager;
     private int[] appIds;
 
     public int getId() {
@@ -38,6 +39,15 @@ public class UserVo {
         this.password = password;
     }
 
+    public boolean isManager() {
+        return manager;
+    }
+
+    public UserVo setManager(boolean manager) {
+        this.manager = manager;
+        return this;
+    }
+
     public int[] getAppIds() {
         if (appIds == null) {
             return ArrayUtils.EMPTY_INT_ARRAY;
@@ -55,6 +65,7 @@ public class UserVo {
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", manager=" + manager +
                 ", appIds=" + Arrays.toString(appIds) +
                 '}';
     }

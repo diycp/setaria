@@ -42,8 +42,7 @@ public class UserController {
     @ResponseBody
     public Object save(@RequestBody UserVo userVo) {
         User user = new User();
-        user.setEmail(userVo.getEmail());
-        user.setPassword(userVo.getPassword());
+        BeanUtils.copyProperties(userVo, user);
 
         userService.save(user, userVo.getAppIds());
         return Result.SUCCESS;

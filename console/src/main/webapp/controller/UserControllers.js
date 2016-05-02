@@ -28,7 +28,12 @@
         $('select').chosen();
 
         $scope.addUser = function () {
-            $http.post('p/users', {email: $scope.email, password: $scope.password, appIds: $scope.appIds})
+            $http.post('p/users', {
+                    email: $scope.email,
+                    password: $scope.password,
+                    manager: $scope.manager,
+                    appIds: $scope.appIds
+                })
                 .success(function (data) {
                     $.alert({
                         content: '保存成功',
@@ -64,6 +69,7 @@
             $http.put('p/users/' + $scope.id, {
                     email: $scope.email,
                     password: $scope.password,
+                    manager: $scope.manager,
                     appIds: $('select').val()
                 })
                 .success(function (data) {

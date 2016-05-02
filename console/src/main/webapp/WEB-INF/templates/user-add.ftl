@@ -15,14 +15,14 @@
 
                 <div>
                     <label class="am-radio-inline">
-                        <input type="radio" value="1" name="manager"> 管理员
+                        <input type="radio" ng-value="true" ng-model="manager"> 管理员
                     </label>
                     <label class="am-radio-inline">
-                        <input type="radio" value="0" name="manager" checked> 普通用户
+                        <input type="radio" ng-value="false" ng-model="manager"> 普通用户
                     </label>
                 </div>
             </div>
-            <div class="am-form-group">
+            <div class="am-form-group" ng-show="!manager">
                 <label for="appIds">应用：</label>
                 <select id="appIds" ng-model="appIds" multiple>
                 <#list apps as app>

@@ -4,11 +4,11 @@
 <mapper namespace="com.weghst.setaria.core.repository.UserRepository">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_user(email,password,createdTime) VALUES(#{email}, #{password}, #{createdTime})
+        INSERT INTO t_user(email,password, manager,createdTime) VALUES(#{email}, #{password}, #{manager}, #{createdTime})
     </insert>
 
     <update id="update">
-        UPDATE t_user SET email=#{email}, password=#{password} WHERE id=#{id}
+        UPDATE t_user SET email=#{email}, password=#{password}, manager=#{manager} WHERE id=#{id}
     </update>
 
     <delete id="deleteById">

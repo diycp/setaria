@@ -67,19 +67,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(User user, int[] appIds) {
         User dbUser = findById(user.getId());
-        boolean updatedUser = false;
         if (!ObjectUtils.nullSafeEquals(user.getEmail(), dbUser.getEmail())) {
             dbUser.setEmail(user.getEmail());
-            updatedUser = true;
         }
         if (!ObjectUtils.nullSafeEquals(user.getPassword(), dbUser.getPassword())) {
             dbUser.setPassword(DigestUtils.md5Hex(user.getPassword()));
-            updatedUser = true;
         }
 
-        if (updatedUser) {
-            userRepository.update(dbUser);
-        }
+        dbUser.setManager(user.isManager());
+        userRepository.update(dbUser);
 
         // 更新APP
         int[] dbAppIds = findUserAppIds(user.getId());
