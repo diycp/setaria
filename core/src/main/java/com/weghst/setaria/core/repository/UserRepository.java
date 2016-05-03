@@ -2,11 +2,9 @@ package com.weghst.setaria.core.repository;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.weghst.setaria.core.domain.User;
-import com.weghst.setaria.core.domain.UserApp;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)
