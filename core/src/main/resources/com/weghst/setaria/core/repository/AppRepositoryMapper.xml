@@ -20,6 +20,10 @@
         SELECT * FROM t_app WHERE id=#{value}
     </select>
 
+    <select id="findByNameAndEnv" resultType="com.weghst.setaria.core.domain.App">
+        SELECT * FROM t_app WHERE name=#{name} AND env=#{env}
+    </select>
+
     <select id="findAppsByUserId" resultType="com.weghst.setaria.core.domain.App">
         SELECT * FROM t_app WHERE id IN (SELECT appId FROM t_user_app WHERE userId=#{value}) ORDER BY id DESC
     </select>

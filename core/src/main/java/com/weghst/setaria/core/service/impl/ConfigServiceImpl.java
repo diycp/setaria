@@ -1,26 +1,29 @@
 package com.weghst.setaria.core.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonException;
-
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.weghst.setaria.core.ObjectMapperUtils;
 import com.weghst.setaria.core.domain.App;
 import com.weghst.setaria.core.domain.Config;
 import com.weghst.setaria.core.domain.ConfigChangedHistory;
+import com.weghst.setaria.core.domain.Env;
+import com.weghst.setaria.core.dto.ConfigDto;
 import com.weghst.setaria.core.repository.AppRepository;
 import com.weghst.setaria.core.repository.ConfigChangedHistoryRepository;
 import com.weghst.setaria.core.repository.ConfigRepository;
+import com.weghst.setaria.core.service.AppNotFoundException;
 import com.weghst.setaria.core.service.ConfigService;
 
 /**
@@ -31,13 +34,6 @@ import com.weghst.setaria.core.service.ConfigService;
 public class ConfigServiceImpl implements ConfigService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigServiceImpl.class);
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
-    {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-        objectMapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-    }
 
     @Autowired
     private ConfigRepository configRepository;
@@ -45,6 +41,27 @@ public class ConfigServiceImpl implements ConfigService {
     private AppRepository appRepository;
     @Autowired
     private ConfigChangedHistoryRepository configChangedHistoryRepository;
+
+    // -------------------------------------------------
+    @Value("${setaria.zookeeper.servers}")
+    private String zookeeperServers;
+    @Value("${setaria.zookeeper.basePath}")
+    private String zookeeperBasePath;
+    @Value("${setaria.pull.config.url}")
+    private String pullConfigUrl;
+
+    private void updateZookeeper(App app) {
+        try {
+            ZooKeeper zooKeeper = new ZooKeeper(zookeeperServers, 3000, new Watcher() {
+                @Override public void process(WatchedEvent event) {
+
+                }
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void save(Config config, String operator) {
@@ -99,13 +116,29 @@ public class ConfigServiceImpl implements ConfigService {
         return configRepository.findByAppId(appId);
     }
 
-    private String configToJson(Config config) {
-        try {
-            return objectMapper.writeValueAsString(config);
-        } catch (JsonProcessingException e) {
-            LOG.error("Config 转换 json 错误", e);
-            throw new JsonException("Config 转换 json 错误", e);
+    @Override
+    public List<ConfigDto> findByAppNameAndEnv(String appName, Env appEnv) throws AppNotFoundException {
+        App app = appRepository.findByNameAndEnv(appName, appEnv);
+        if (app == null) {
+            throw new AppNotFoundException("未找到应用 [name:" + appName + ", env:" + appEnv + "]");
         }
+
+        // TODO: 预处理配置属性值
+        List<Config> configs = findByAppId(app.getId());
+        List<ConfigDto> list = new ArrayList<>(configs.size());
+        ConfigDto configDto;
+        for (Config config : configs) {
+            configDto = new ConfigDto();
+            configDto.setKey(config.getKey());
+            configDto.setValue(config.getValue());
+            configDto.setDescription(config.getDescription());
+            list.add(configDto);
+        }
+        return list;
+    }
+
+    private String configToJson(Config config) {
+        return ObjectMapperUtils.writeValueAsString(config);
     }
 
     private ConfigChangedHistory newConfigChangedHistory(Config config, String action, String operator) {

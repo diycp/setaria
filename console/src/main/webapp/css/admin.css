@@ -118,3 +118,8 @@ ul {
         background: #E4E4E4;
     }
 }
+
+/**/
+.dataTable tbody tr td {
+    word-break: break-all;
+}

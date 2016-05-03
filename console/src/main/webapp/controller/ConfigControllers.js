@@ -1,7 +1,6 @@
 (function (module) {
 
     module.controller('ConfigListController', function ($scope, $http, $state, $stateParams) {
-
         $scope.deleteConfig = function (id, key) {
             $.confirm({
                 content: '确认删除配置[' + key + "]吗",

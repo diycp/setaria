@@ -5,6 +5,10 @@
             columns: [{}, {},
                 {
                     searchable: false,
+                    width: 80
+                },
+                {
+                    searchable: false,
                     width: 190
                 },
                 {
@@ -30,6 +34,7 @@
             <tr>
                 <td>ID</td>
                 <td>邮箱</td>
+                <td>类型</td>
                 <td>创建时间</td>
                 <td>操作</td>
             </tr>
@@ -38,11 +43,19 @@
             <tr>
                 <td>${user.id}</td>
                 <td>${user.email}</td>
+                <td>
+                    <#if user.manager>
+                        <span class="am-badge am-badge-success">管理员</span>
+                    <#else>
+                        <span class="am-badge">普通用户</span>
+                    </#if>
+                </td>
                 <td>${user.createdTime?number_to_date?string("yyyy-MM-dd HH:mm:ss")}</td>
                 <td>
                     <#if user.email != rootUser>
                         <a ui-sref="user-edit({id:${user.id}})" title="编辑"><i class="am-icon-edit"></i></a>
-                        <a href ng-click="deleteUser(${user.id}, '${user.email}')" title="删除"><i class="am-icon-remove"></i></a>
+                        <a href ng-click="deleteUser(${user.id}, '${user.email}')" title="删除"><i
+                                class="am-icon-remove"></i></a>
                     </#if>
                 </td>
             </tr>

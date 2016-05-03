@@ -3,18 +3,21 @@ package com.weghst.setaria.core.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.curator.RetryPolicy;
-import org.apache.curator.RetrySleeper;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
+import org.apache.curator.retry.RetryOneTime;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,19 +45,38 @@ public class AppServiceImpl implements AppService {
     @Autowired
     private UserRepository userRepository;
 
+    // -------------------------------------------------
+    @Value("${setaria.zookeeper.servers}")
+    private String zookeeperServers;
+    @Value("${setaria.zookeeper.basePath}")
+    private String zookeeperBasePath;
+    @Value("${setaria.pull.config.url}")
+    private String pullConfigUrl;
+
+    private CuratorFramework curatorFramework;
+
+    @PostConstruct
+    public void init() {
+        curatorFramework = CuratorFrameworkFactory.newClient(zookeeperServers, new RetryOneTime(3000));
+        curatorFramework.create();
+        // FIXME
+    }
+
+    @PreDestroy
+    public void destroy() {
+        if (curatorFramework != null) {
+            curatorFramework.close();
+        }
+    }
+
     @Override
     public boolean inform(App app) {
-        CuratorFramework curatorFramework = CuratorFrameworkFactory.newClient("127.0.0.1:2181", new RetryPolicy() {
-            @Override
-            public boolean allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper) {
-                LOG.error("ZooKeeper 连接断开");
-                return false;
-            }
-        });
+        CuratorFramework curatorFramework = CuratorFrameworkFactory.newClient("127.0.0.1:2181", new RetryOneTime(1000));
         curatorFramework.start();
 
         final NodeCache nodeCache = new NodeCache(curatorFramework, buildPath(app), false);
         try {
+            nodeCache.close();
             nodeCache.start(true);
             final AtomicInteger seq = new AtomicInteger(0);
             nodeCache.getListenable().addListener(new NodeCacheListener() {
@@ -70,6 +92,7 @@ public class AppServiceImpl implements AppService {
         }
 
         try {
+            curatorFramework.create().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(zookeeperBasePath);
             Stat stat = curatorFramework.checkExists().forPath(buildPath(app));
             if (stat == null) {
                 curatorFramework.create().forPath(buildPath(app));
@@ -171,6 +194,7 @@ public class AppServiceImpl implements AppService {
         return sb.toString();
     }
 
+    @SuppressWarnings("Duplicates")
     private void saveUserApps(int appId, int[] userIds) {
         if (userIds.length == 0) {
             return;

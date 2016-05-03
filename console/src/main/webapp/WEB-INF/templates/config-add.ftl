@@ -1,3 +1,8 @@
+<script>
+    $(function () {
+        $('#key').focus();
+    });
+</script>
 <div class="am-panel am-panel-default" ng-controller="ConfigAddController">
     <div class="am-panel-hd">配置添加</div>
     <div class="am-panel-bd">
@@ -16,10 +21,6 @@
             <div class="am-form-group">
                 <label for="description">描述：</label>
                 <textarea name="description" ng-model="config.description" maxlength="512"></textarea>
-            </div>
-            <div class="am-form-group">
-                <label>应用：</label>
-                <input type="text" ng-model="appName" disabled/>
             </div>
             <input type="submit" value="保 存" class="am-btn am-btn-primary am-btn-block"/>
         </form>

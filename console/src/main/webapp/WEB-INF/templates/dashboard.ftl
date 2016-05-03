@@ -11,7 +11,6 @@
     <script src="js/angular-ui-router.min.js"></script>
     <script src="js/dateFormat.js"></script>
     <script src="js/ocLazyLoad.min.js"></script>
-    <script src="js/jquery.ellipsis.js"></script>
 
     <!-- Amaze UI 基础 -->
     <link rel="stylesheet" href="amaze-ui/css/amazeui.min.css"/>
@@ -109,15 +108,16 @@
                 </a>
                 <ul class="am-list am-collapse admin-sidebar-sub" id="app-manager-nav">
                 <#list apps as app>
-                    <li><a ui-sref="configs-app({appId:555})" class="am-cf"> <span>${app.name}</span>
-                        <#if app.env.code==3>
-                            <span class="am-badge">开发</span>
-                        <#elseif app.env.code=2>
-                            <span class="am-badge am-badge-secondary">测试</span>
-                        <#elseif app.env.code=1>
-                            <span class="am-badge am-badge-success">生产</span>
-                        </#if>
-                    </a></li>
+                    <li style="word-break: break-all">
+                        <a ui-sref="config-app({appId:${app.id}})" class="am-cf"><span> ${app.name}</span>
+                            <#if app.env.code==3>
+                                <span class="am-badge">开发</span>
+                            <#elseif app.env.code=2>
+                                <span class="am-badge am-badge-secondary">测试</span>
+                            <#elseif app.env.code=1>
+                                <span class="am-badge am-badge-success">生产</span>
+                            </#if>
+                        </a></li>
                 </#list>
                 </ul>
             </li>

@@ -7,10 +7,8 @@
                 {
                     width: 50
                 },
-                {},
                 {
-                    searchable: false,
-                    width: 180
+                    width: 250
                 },
                 {
                     searchable: false,
@@ -18,14 +16,15 @@
                 },
                 {
                     searchable: false,
-                    width: 50
+                    width: 180
+                },
+                {
+                    searchable: false,
+                    width: 55
                 }]
         });
-
     });
 </script>
-
-
 <div class="am-panel am-panel-default" ng-controller="AppListController">
     <div class="am-panel-hd">
         <div class="am-fl">应用列表</div>
@@ -60,7 +59,7 @@
                         <span class="am-badge am-badge-success">生产</span>
                     </#if>
                 </td>
-                <td><span>${app.description!""}</span></td>
+                <td>${app.description!""}</td>
                 <td>${app.createdTime?number_to_datetime?string("yyyy-MM-dd HH:mm")}</td>
                 <td><#if app.lastUpdatedTime!=0>${app.lastUpdatedTime?number_to_datetime?string("yyyy-MM-dd HH:mm")}</#if></td>
                 <td>
