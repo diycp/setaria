@@ -12,6 +12,10 @@
          WHERE id=#{id}
     </update>
 
+    <update id="updateVersion">
+        UPDATE t_app SET version=#{version} WHERE id=#{id}
+    </update>
+
     <delete id="deleteById">
         DELETE FROM t_app WHERE id=#{value}
     </delete>

@@ -17,17 +17,24 @@ public interface AppRepository {
     /**
      * @param app
      */
-    void save(App app);
+    int save(App app);
 
     /**
      * @param app
      */
-    void update(App app);
+    int update(App app);
+
+    /**
+     * @param id
+     * @param version
+     * @return
+     */
+    int updateVersion(@Param("id") int id, @Param("version") long version);
 
     /**
      * @param id
      */
-    void deleteById(int id);
+    int deleteById(int id);
 
     /**
      * @param id

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import com.weghst.setaria.core.repository.AppRepository;
 import com.weghst.setaria.core.repository.ConfigChangedHistoryRepository;
 import com.weghst.setaria.core.repository.ConfigRepository;
 import com.weghst.setaria.core.service.AppNotFoundException;
+import com.weghst.setaria.core.service.ConfigChangedEvent;
 import com.weghst.setaria.core.service.ConfigService;
 
 /**
@@ -41,6 +43,8 @@ public class ConfigServiceImpl implements ConfigService {
     private AppRepository appRepository;
     @Autowired
     private ConfigChangedHistoryRepository configChangedHistoryRepository;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     // -------------------------------------------------
     @Value("${setaria.zookeeper.servers}")
@@ -50,21 +54,10 @@ public class ConfigServiceImpl implements ConfigService {
     @Value("${setaria.pull.config.url}")
     private String pullConfigUrl;
 
-    private void updateZookeeper(App app) {
-        try {
-            ZooKeeper zooKeeper = new ZooKeeper(zookeeperServers, 3000, new Watcher() {
-                @Override public void process(WatchedEvent event) {
-
-                }
-            });
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void save(Config config, String operator) {
+        App app = appRepository.findById(config.getAppId());
+
         config.setCreatedTime(System.currentTimeMillis());
         configRepository.save(config);
 
@@ -74,11 +67,15 @@ public class ConfigServiceImpl implements ConfigService {
                 .setConfigId(config.getId())
                 .setChanged(configToJson(config));
         configChangedHistoryRepository.save(configChangedHistory);
+
+        // 配置更新通知
+        applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
     }
 
     @Override
     public void update(Config config, String operator) {
         Config dbConfig = configRepository.findById(config.getId());
+        App app = appRepository.findById(dbConfig.getAppId());
 
         config.setLastUpdatedTime(System.currentTimeMillis());
         configRepository.update(config);
@@ -89,11 +86,15 @@ public class ConfigServiceImpl implements ConfigService {
                 .setOriginal(configToJson(dbConfig))
                 .setChanged(configToJson(config));
         configChangedHistoryRepository.save(configChangedHistory);
+
+        // 配置更新通知
+        applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
     }
 
     @Override
     public void delete(int id, String operator) {
         Config dbConfig = configRepository.findById(id);
+        App app = appRepository.findById(dbConfig.getAppId());
 
         configRepository.deleteById(id);
 
@@ -102,6 +103,9 @@ public class ConfigServiceImpl implements ConfigService {
                 ConfigChangedHistory.ACTION_DELETE, operator)
                 .setOriginal(configToJson(dbConfig));
         configChangedHistoryRepository.save(configChangedHistory);
+
+        // 配置更新通知
+        applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
     }
 
     @Transactional(readOnly = true)

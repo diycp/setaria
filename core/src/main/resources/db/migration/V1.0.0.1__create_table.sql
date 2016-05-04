@@ -13,6 +13,7 @@ CREATE TABLE `t_app` (
   `name` varchar(30) COLLATE utf8_bin NOT NULL COMMENT 'APP 名称',
   `env` varchar(30) COLLATE utf8_bin NOT NULL COMMENT 'APP 应用环境',
   `description` varchar(256) COLLATE utf8_bin DEFAULT NULL COMMENT 'APP 描述',
+  `version` bigint(20) COLLATE utf8_bin DEFAULT '0' COMMENT '应用配置的版本时间',
   `createdTime` bigint(20) DEFAULT NULL COMMENT '创建时间',
   `lastUpdatedTime` bigint(20) DEFAULT '0' COMMENT '最后修改时间',
   PRIMARY KEY (`id`),

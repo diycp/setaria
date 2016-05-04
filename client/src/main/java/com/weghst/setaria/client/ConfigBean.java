@@ -5,15 +5,15 @@ package com.weghst.setaria.client;
  */
 public class ConfigBean {
 
-    private String name;
+    private String key;
     private String value;
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getValue() {
@@ -31,14 +31,14 @@ public class ConfigBean {
 
         ConfigBean that = (ConfigBean) o;
 
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
         return !(value != null ? !value.equals(that.value) : that.value != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
+        int result = key != null ? key.hashCode() : 0;
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
@@ -46,7 +46,7 @@ public class ConfigBean {
     @Override
     public String toString() {
         return "ConfigBean{" +
-                "name='" + name + '\'' +
+                "key='" + key + '\'' +
                 ", value='" + value + '\'' +
                 '}';
     }

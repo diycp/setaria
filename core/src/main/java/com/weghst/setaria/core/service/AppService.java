@@ -12,12 +12,6 @@ public interface AppService {
 
     /**
      * @param app
-     * @return
-     */
-    boolean inform(App app);
-
-    /**
-     * @param app
      */
     void save(App app);
 

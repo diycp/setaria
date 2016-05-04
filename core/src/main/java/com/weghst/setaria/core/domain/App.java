@@ -24,6 +24,10 @@ public class App implements Serializable {
      */
     private Env env;
     /**
+     * 应用配置版本.
+     */
+    private long version;
+    /**
      * 创建时间.
      */
     private long createdTime;
@@ -60,6 +64,14 @@ public class App implements Serializable {
         this.env = env;
     }
 
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
     public long getCreatedTime() {
         return createdTime;
     }
@@ -84,12 +96,12 @@ public class App implements Serializable {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "App{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", env=" + env +
+                ", version=" + version +
                 ", createdTime=" + createdTime +
                 ", lastUpdatedTime=" + lastUpdatedTime +
                 ", description='" + description + '\'' +
