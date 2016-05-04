@@ -20,11 +20,38 @@
                 },
                 {
                     searchable: false,
-                    width: 55
+                    width: 75
                 }]
+        });
+
+        $('.am-modal-bd table').DataTable({
+            bSort: false,
+            bLengthChange: false
         });
     });
 </script>
+
+<div class="am-modal am-modal-no-btn" tabindex="-1" id="client-infos-modal">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">客户端信息
+            <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+        </div>
+        <div class="am-modal-bd">
+            <table class="am-table am-table-striped am-table-bordered am-table-compact">
+                <thead>
+                <tr>
+                    <td>主机</td>
+                    <td>配置拉取时间</td>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 动态添加客户端信息 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div class="am-panel am-panel-default" ng-controller="AppListController">
     <div class="am-panel-hd">
         <div class="am-fl">应用列表</div>
@@ -65,6 +92,7 @@
                 <td>
                     <a ui-sref="app-edit({id:${app.id}})" title="编辑"><i class="am-icon-edit"></i></a>
                     <a href ng-click="deleteApp(${app.id},'${app.name}')" title="删除"><i class="am-icon-remove"></i></a>
+                    <a href ng-click="showClientInfos(${app.id})" title="查看客户端信息"><i class="am-icon-eye"></i></a>
                 </td>
             </tr>
             </#list>

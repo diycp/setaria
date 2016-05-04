@@ -21,6 +21,27 @@
                 }
             });
         }
+
+        $scope.showClientInfos = function (id) {
+            $http.get('p/apps/' + id + "/clientInfos").success(function (data) {
+                var html = '';
+                $.each(data, function (i, v) {
+                    html += '<tr>';
+                    html += '<td>' + v.host + '</td>';
+                    html += '<td>' + (new Date(v.lastPullTime * 1000)).format(dateFormat.masks.chinaDateTime) + '</td>';
+                    html += '</tr>';
+                });
+
+                $('#client-infos-modal tbody').html(html);
+
+                $('#client-infos-modal').modal({
+                    width: 700,
+                    height: 550
+                });
+            }).error(function (data) {
+                alert(data);
+            });
+        }
     });
 
     module.controller('AppAddController', function ($scope, $http, $state) {

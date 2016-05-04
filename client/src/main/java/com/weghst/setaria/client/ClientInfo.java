@@ -8,18 +8,18 @@ public class ClientInfo {
     /**
      * 主机地址.
      */
-    private String hostAddress;
+    private String host;
     /**
      * 最后拉取配置时间 (unix timestamp).
      */
     private long lastPullTime;
 
-    public String getHostAddress() {
-        return hostAddress;
+    public String getHost() {
+        return host;
     }
 
-    public ClientInfo setHostAddress(String hostAddress) {
-        this.hostAddress = hostAddress;
+    public ClientInfo setHost(String host) {
+        this.host = host;
         return this;
     }
 
@@ -35,7 +35,7 @@ public class ClientInfo {
     @Override
     public String toString() {
         return "ClientInfo{" +
-                "hostAddress='" + hostAddress + '\'' +
+                "host='" + host + '\'' +
                 ", lastPullTime=" + lastPullTime +
                 '}';
     }

@@ -12,7 +12,6 @@ import org.apache.zookeeper.common.PathUtils;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -28,6 +27,7 @@ import com.squareup.okhttp.Response;
 public class DistributedSetariaConfig extends AbstractSetariaConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributedSetariaConfig.class);
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     {
@@ -78,7 +78,8 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         app = getConfigParameter(CONFIG_APP);
         env = getConfigParameter(CONFIG_ENV);
 
-        path = normalizePath(Paths.get(basePath, APPS_NODE_PATH, app, env).toString());
+        // FIXME 优化
+        path = normalizePath(Paths.get(basePath, APPS_NODE_PATH, app + "-" + env).toString());
 
         LOG.debug("分布式配置参数 connectString: {}, path: {}", connectString, path);
         PathUtils.validatePath(path);
@@ -87,10 +88,13 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
             zooKeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
-                    System.out.println(event);
+                    if (path.equals(event.getPath()) && event.getType() == Event.EventType.NodeDataChanged) {
+                        refresh();
+                    }
                 }
             });
         } catch (IOException e) {
+            LOG.error("连接 ZooKeeper 服务器错误 ->> {}", connectString, e);
             throw new SetariaConfigException(e);
         }
     }
@@ -147,24 +151,22 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         Stat stat = new Stat();
         try {
             byte[] bytes = zooKeeper.getData(path, true, stat);
-
-            System.out.println(new String(bytes));
             loadConfigs();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SetariaConfigException(e);
         }
     }
 
     private void refreshZkClientInfo() {
         ClientInfo clientInfo = new ClientInfo();
-        InetAddress localHost;
+        InetAddress host;
         try {
-            localHost = InetAddress.getLocalHost();
+            host = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             throw new IllegalStateException(e);
         }
 
-        clientInfo.setHostAddress(localHost.getHostAddress());
+        clientInfo.setHost(host.toString());
         clientInfo.setLastPullTime(System.currentTimeMillis() / 1000);
 
         byte[] bytes;
@@ -178,13 +180,14 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
             zooKeeper.create(normalizePath(path + CLIENT_NODE_PATH), bytes, ZooDefs.Ids.READ_ACL_UNSAFE,
                     CreateMode.EPHEMERAL_SEQUENTIAL);
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            LOG.error("向 ZooKeeper 提交客户端信息错误 ->> {}", clientInfo, e);
+            throw new SetariaConfigException(e);
         }
     }
 
     private void loadConfigs() {
         String url = getUrl();
-        LOG.debug("读取[{}]配置", url);
+        LOG.debug("读取 [{}] 配置", url);
 
         HttpUrl httpUrl = HttpUrl.parse(url).newBuilder().addPathSegment(app).addPathSegment(env).build();
         Request request = new Request.Builder().url(httpUrl).get().build();
@@ -194,14 +197,14 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
             Response response = httpClient.newCall(request).execute();
             configBeans = OBJECT_MAPPER.readValue(response.body().byteStream(), ConfigBean[].class);
         } catch (IOException e) {
-            throw new SetariaConfigException("加载[" + url + "]配置失败", e);
+            throw new SetariaConfigException("加载 [" + url + "] 配置失败", e);
         }
 
         // -----------------------------------------------------
         Properties properties = new Properties();
         for (ConfigBean configBean : configBeans) {
             properties.setProperty(configBean.getKey(), configBean.getValue());
-            LOG.debug("配置项 -> [{}: {}]", configBean.getKey(), configBean.getValue());
+            LOG.debug("配置项 ->> [{}: {}]", configBean.getKey(), configBean.getValue());
         }
 
         //
@@ -219,15 +222,4 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         return normalizedPath;
     }
 
-    private class ConfigPathWatcher implements Watcher {
-
-        @Override
-        public void process(WatchedEvent event) {
-            LOG.debug("节点[{}]事件", event);
-
-            if (event.getType() == Event.EventType.NodeDataChanged) {
-                refresh();
-            }
-        }
-    }
 }

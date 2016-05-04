@@ -93,18 +93,23 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void delete(int id, String operator) {
-        Config dbConfig = configRepository.findById(id);
-        App app = appRepository.findById(dbConfig.getAppId());
-
-        configRepository.deleteById(id);
-
-        // 保存操作历史
-        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(dbConfig,
-                ConfigChangedHistory.ACTION_DELETE, operator)
-                .setOriginal(configToJson(dbConfig));
-        configChangedHistoryRepository.save(configChangedHistory);
+        Config config = configRepository.findById(id);
+        delete0(config, operator);
 
         // 配置更新通知
+        App app = appRepository.findById(config.getAppId());
+        applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
+    }
+
+    @Override
+    public void deleteByAppId(int appId, String operator) {
+        List<Config> configs = findByAppId(appId);
+        for (Config config : configs) {
+            delete0(config, operator);
+        }
+
+        // 配置更新通知
+        App app = appRepository.findById(appId);
         applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
     }
 
@@ -139,6 +144,16 @@ public class ConfigServiceImpl implements ConfigService {
             list.add(configDto);
         }
         return list;
+    }
+
+    private void delete0(Config config, String operator) {
+        configRepository.deleteById(config.getId());
+
+        // 保存操作历史
+        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(config,
+                ConfigChangedHistory.ACTION_DELETE, operator)
+                .setOriginal(configToJson(config));
+        configChangedHistoryRepository.save(configChangedHistory);
     }
 
     private String configToJson(Config config) {

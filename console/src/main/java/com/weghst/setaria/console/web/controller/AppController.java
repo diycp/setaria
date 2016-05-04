@@ -51,8 +51,9 @@ public class AppController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public Object delete(@PathVariable int id) {
-        appService.deleteById(id);
+    public Object delete(@PathVariable int id, HttpSession session) {
+        User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
+        appService.deleteById(id, user.getEmail());
         return Result.SUCCESS;
     }
 
@@ -65,6 +66,12 @@ public class AppController {
 
         appVo.setUserIds(appService.findAppUserIds(id));
         return appVo;
+    }
+
+    @RequestMapping(value = "/{id}/clientInfos", method = RequestMethod.GET)
+    @ResponseBody
+    public Object loadClientInfos(@PathVariable int id) {
+        return appService.loadClientInfo(id);
     }
 
     @RequestMapping("/add.v")

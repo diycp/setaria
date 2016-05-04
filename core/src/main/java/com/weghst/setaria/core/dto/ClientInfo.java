@@ -5,25 +5,15 @@ package com.weghst.setaria.core.dto;
  */
 public class ClientInfo {
 
-    private String hostAddress;
-    private String hostName;
+    private String host;
     private long lastPullTime;
 
-    public String getHostAddress() {
-        return hostAddress;
+    public String getHost() {
+        return host;
     }
 
-    public ClientInfo setHostAddress(String hostAddress) {
-        this.hostAddress = hostAddress;
-        return this;
-    }
-
-    public String getHostName() {
-        return hostName;
-    }
-
-    public ClientInfo setHostName(String hostName) {
-        this.hostName = hostName;
+    public ClientInfo setHost(String host) {
+        this.host = host;
         return this;
     }
 
@@ -36,19 +26,10 @@ public class ClientInfo {
         return this;
     }
 
-    public String toJson() {
-        StringBuilder sb = new StringBuilder("{");
-        sb.append("\"hostAddress\":\"").append(hostAddress).append("\",")
-                .append("\"hostName\":\"").append(hostName).append("\",")
-                .append("\"lastPullTime\":").append(lastPullTime);
-        return sb.append("}").toString();
-    }
-
     @Override
     public String toString() {
         return "ClientInfo{" +
-                "hostAddress='" + hostAddress + '\'' +
-                ", hostName='" + hostName + '\'' +
+                "host='" + host + '\'' +
                 ", lastPullTime=" + lastPullTime +
                 '}';
     }

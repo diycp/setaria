@@ -4,6 +4,7 @@ package com.weghst.setaria.core.service;
 import java.util.List;
 
 import com.weghst.setaria.core.domain.App;
+import com.weghst.setaria.core.dto.ClientInfo;
 
 /**
  * @author Kevin Zou (zouyong@shzhiduan.com)
@@ -34,8 +35,9 @@ public interface AppService {
 
     /**
      * @param id
+     * @param operator
      */
-    void deleteById(int id);
+    void deleteById(int id, String operator);
 
     /**
      * @param id
@@ -56,7 +58,6 @@ public interface AppService {
     List<App> findAppsByUserIdOrRole(int userId);
 
     /**
-     *
      * @param appId
      * @return
      */
@@ -66,4 +67,12 @@ public interface AppService {
      * @return
      */
     List<App> findAll();
+
+    /**
+     * 根据应用 ID 加载客户端加载配置信息状态.
+     *
+     * @param id 应用 ID
+     * @return 客户端加载配置信息状态
+     */
+    List<ClientInfo> loadClientInfo(int id);
 }

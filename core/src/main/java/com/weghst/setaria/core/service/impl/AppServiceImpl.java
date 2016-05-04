@@ -2,7 +2,6 @@ package com.weghst.setaria.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -20,13 +19,18 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.weghst.setaria.core.domain.*;
+import com.weghst.setaria.core.ObjectMapperUtils;
+import com.weghst.setaria.core.domain.App;
+import com.weghst.setaria.core.domain.Env;
+import com.weghst.setaria.core.domain.User;
+import com.weghst.setaria.core.domain.UserApp;
+import com.weghst.setaria.core.dto.ClientInfo;
 import com.weghst.setaria.core.repository.AppRepository;
-import com.weghst.setaria.core.repository.ConfigRepository;
 import com.weghst.setaria.core.repository.UserAppRepository;
 import com.weghst.setaria.core.repository.UserRepository;
 import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.ConfigChangedEvent;
+import com.weghst.setaria.core.service.ConfigService;
 import com.weghst.setaria.core.util.ZooKeeperException;
 
 /**
@@ -38,8 +42,8 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
 
     private static final Logger LOG = LoggerFactory.getLogger(AppServiceImpl.class);
 
-    private static final String PULL_CONFIG_URL_PATH = "/url";
-    private static final String APPS_PATH = "/apps";
+    private static final String PULL_CONFIG_URL_NODE_PATH = "/url";
+    private static final String APP_PARENT_NODE_PATH = "/apps";
 
     @Autowired
     private AppRepository appRepository;
@@ -48,7 +52,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private ConfigRepository configRepository;
+    private ConfigService configService;
 
     // -------------------------------------------------
     @Value("${setaria.zookeeper.servers}")
@@ -67,7 +71,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         createNode(zookeeperBasePath, null);
 
         try {
-            String urlPath = normalizePath(zookeeperBasePath + PULL_CONFIG_URL_PATH);
+            String urlPath = normalizePath(zookeeperBasePath + PULL_CONFIG_URL_NODE_PATH);
             Stat stat = curatorFramework.checkExists().forPath(urlPath);
             if (stat == null) {
                 curatorFramework.create().forPath(urlPath, pullConfigUrl.getBytes());
@@ -85,7 +89,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         }
 
         // 创建 apps 节点
-        String appsPath = normalizePath(zookeeperBasePath + APPS_PATH);
+        String appsPath = normalizePath(zookeeperBasePath + APP_PARENT_NODE_PATH);
         createNode(appsPath, null);
 
         // 创建应用节点
@@ -97,65 +101,11 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         }
     }
 
-    private String normalizePath(String path) {
-        String normalizedPath = path.replaceAll("//+", "/").replaceFirst("(.+)/$", "$1");
-        PathUtils.validatePath(normalizedPath);
-        return normalizedPath;
-    }
-
-    private void createNode(String path, byte[] bytes) {
-        try {
-            Stat stat = curatorFramework.checkExists().forPath(path);
-            if (stat == null) {
-                if (bytes == null) {
-                    curatorFramework.create().forPath(path);
-                } else {
-                    curatorFramework.create().forPath(path, bytes);
-                }
-            }
-        } catch (Exception e) {
-            throw new ZooKeeperException(e);
-        }
-    }
-
-    private String createAppNode(App app) {
-        String appPath = zookeeperBasePath + APPS_PATH + "/" + app.getName();
-        String envPath = appPath + "/" + app.getEnv().name();
-        createNode(appPath, null);
-        createNode(envPath, null);
-        return envPath;
-    }
-
-    private void updateAppNode(App app) {
-        String appPath = zookeeperBasePath + APPS_PATH + "/" + app.getName();
-        String envPath = appPath + "/" + app.getEnv().name();
-        try {
-            if (curatorFramework.checkExists().forPath(envPath) == null) {
-                createAppNode(app);
-            }
-            String version = String.valueOf(app.getVersion());
-            curatorFramework.setData().forPath(envPath, version.getBytes());
-        } catch (Exception e) {
-            throw new ZooKeeperException(e);
-        }
-    }
-
-    private void deleteAppNode(App app) {
-        String appPath = zookeeperBasePath + APPS_PATH + "/" + app.getName();
-        String envPath = appPath + "/" + app.getEnv().name();
-        try {
-            curatorFramework.delete().forPath(envPath);
-            curatorFramework.delete().forPath(appPath);
-        } catch (Exception e) {
-            // ignore
-        }
-    }
-
     @PreDestroy
     public void destroy() {
         if (curatorFramework != null) {
             try {
-                String appPath = zookeeperBasePath + APPS_PATH;
+                String appPath = zookeeperBasePath + APP_PARENT_NODE_PATH;
                 List<String> appNames = curatorFramework.getChildren().forPath(appPath);
                 for (String appName : appNames) {
                     List<String> appEnvs = curatorFramework.getChildren().forPath(appPath + "/" + appName);
@@ -226,15 +176,11 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
     }
 
     @Override
-    public void deleteById(int id) {
-        List<Config> configs = configRepository.findByAppId(id);
-        // 如果应用下有配置项，不让其删除
-        if (!configs.isEmpty()) {
-            throw new IllegalStateException("删除应用 [" + id + "] 之前请先删除应用下所管理的配置");
-        }
+    public void deleteById(int id, String operator) {
+        configService.deleteByAppId(id, operator);
 
-        appRepository.deleteById(id);
         userAppRepository.deleteByAppId(id);
+        appRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
@@ -272,11 +218,26 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         return appRepository.findAll();
     }
 
-    // FIXME
-    private String buildPath(App app) {
-        StringBuilder sb = new StringBuilder("/com/weghst/setaria/");
-        sb.append(app.getName()).append("/").append(app.getEnv());
-        return sb.toString();
+    @Override
+    public List<ClientInfo> loadClientInfo(int id) {
+        App app = findById(id);
+
+        try {
+            List<ClientInfo> clientInfos = new ArrayList<>();
+
+            String nodePath = getAppNodePath(app);
+            List<String> children = curatorFramework.getChildren().forPath(nodePath);
+            byte[] bytes;
+            for (String c : children) {
+                bytes = curatorFramework.getData().forPath(nodePath + "/" + c);
+                clientInfos.add(ObjectMapperUtils.readValue(bytes, ClientInfo.class));
+            }
+
+            return clientInfos;
+        } catch (Exception e) {
+            LOG.error("加载客户端信息错误", e);
+            throw new IllegalStateException(e);
+        }
     }
 
     @SuppressWarnings("Duplicates")
@@ -293,5 +254,58 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
             userApps.add(userApp);
         }
         userAppRepository.saveUserApps(userApps);
+    }
+
+    // ----------------------------- Zookeeper ------------------------------------------
+    private String normalizePath(String path) {
+        String normalizedPath = path.replaceAll("//+", "/").replaceFirst("(.+)/$", "$1");
+        PathUtils.validatePath(normalizedPath);
+        return normalizedPath;
+    }
+
+    private void createNode(String path, byte[] bytes) {
+        try {
+            Stat stat = curatorFramework.checkExists().forPath(path);
+            if (stat == null) {
+                if (bytes == null) {
+                    curatorFramework.create().forPath(path);
+                } else {
+                    curatorFramework.create().forPath(path, bytes);
+                }
+            }
+        } catch (Exception e) {
+            throw new ZooKeeperException(e);
+        }
+    }
+
+    private String getAppNodePath(App app) {
+        return zookeeperBasePath + APP_PARENT_NODE_PATH + "/" + app.getName() + "-" + app.getEnv();
+    }
+
+    private String createAppNode(App app) {
+        String nodePath = getAppNodePath(app);
+        createNode(nodePath, null);
+        return nodePath;
+    }
+
+    private void updateAppNode(App app) {
+        try {
+            String nodePath = getAppNodePath(app);
+            if (curatorFramework.checkExists().forPath(nodePath) == null) {
+                createAppNode(app);
+            }
+            String version = String.valueOf(app.getVersion());
+            curatorFramework.setData().forPath(nodePath, version.getBytes());
+        } catch (Exception e) {
+            throw new ZooKeeperException(e);
+        }
+    }
+
+    private void deleteAppNode(App app) {
+        try {
+            curatorFramework.delete().forPath(getAppNodePath(app));
+        } catch (Exception e) {
+            // ignore
+        }
     }
 }

@@ -30,6 +30,11 @@ public interface ConfigService {
     void delete(int id, String operator);
 
     /**
+     * @param appId
+     */
+    void deleteByAppId(int appId, String operator);
+
+    /**
      * @param id
      * @return
      */
@@ -42,7 +47,6 @@ public interface ConfigService {
     List<Config> findByAppId(int appId);
 
     /**
-     *
      * @param appName
      * @param appEnv
      * @return
