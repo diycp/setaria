@@ -46,9 +46,11 @@
         </#if>) 配置列表
         </div>
         <div class="am-cf">
-            <a ui-sref="config-add({appId:${app.id}, appName:${app.name}})" class="am-btn am-btn-xs am-btn-primary am-fr">
+            <a ui-sref="config-add({appId:${app.id}, appName:${app.name}})"
+               class="am-btn am-btn-xs am-btn-primary am-fr">
                 <i class="am-icon-plus"></i>添加</a>
-            <a disabled class="am-btn am-btn-xs am-btn-primary am-fr"><i class="am-icon-download"></i>导出</a>
+            <a href ng-click="export(${app.id})" class="am-btn am-btn-xs am-btn-primary am-fr">
+                <i class="am-icon-download"></i>导出</a>
             <a disabled class="am-btn am-btn-xs am-btn-primary am-fr"><i class="am-icon-upload"></i>导入</a>
         </div>
     </div>

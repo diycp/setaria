@@ -20,6 +20,12 @@
                 }
             });
         }
+
+        $scope.export = function (appId) {
+            $.fileDownload('p/configs/export/' + appId).fail(function () {
+                alert("导出失败");
+            });
+        }
     });
 
     module.controller('ConfigAddController', function ($scope, $http, $state, $stateParams) {

@@ -1,8 +1,14 @@
 package com.weghst.setaria.console.web.controller;
 
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,9 +19,12 @@ import com.weghst.setaria.console.web.Constants;
 import com.weghst.setaria.console.web.ErrorCodes;
 import com.weghst.setaria.console.web.ErrorResult;
 import com.weghst.setaria.console.web.Result;
+import com.weghst.setaria.core.ObjectMapperUtils;
+import com.weghst.setaria.core.domain.App;
 import com.weghst.setaria.core.domain.Config;
 import com.weghst.setaria.core.domain.Env;
 import com.weghst.setaria.core.domain.User;
+import com.weghst.setaria.core.dto.ConfigDto;
 import com.weghst.setaria.core.service.AppNotFoundException;
 import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.ConfigService;
@@ -86,6 +95,27 @@ public class ConfigController {
             result.setErrorMessage(e.getMessage());
             return ResponseEntity.badRequest().body(result);
         }
+    }
+
+    @RequestMapping(value = "export/{appId}", method = RequestMethod.GET)
+    public void export(@PathVariable int appId, HttpServletResponse response) throws IOException {
+        List<Config> list = configService.findByAppId(appId);
+        List<ConfigDto> configDtos = new ArrayList<>(list.size());
+        for (Config c : list) {
+            ConfigDto configDto = new ConfigDto();
+            BeanUtils.copyProperties(c, configDto);
+            configDtos.add(configDto);
+        }
+
+        App app = appService.findById(appId);
+        String filename = app.getName() + "-" + app.getEnv() + "-" + app.getLastUpdatedTime() + ".json";
+        byte[] bytes = ObjectMapperUtils.writeValueAsBytes(configDtos);
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
+        response.setContentLength(bytes.length);
+
+        response.getOutputStream().write(bytes);
     }
 
     @RequestMapping("/add.v")
