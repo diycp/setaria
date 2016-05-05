@@ -2,6 +2,7 @@ package com.weghst.setaria.core.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -31,6 +32,7 @@ import com.weghst.setaria.core.repository.UserRepository;
 import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.ConfigChangedEvent;
 import com.weghst.setaria.core.service.ConfigService;
+import com.weghst.setaria.core.util.ZkPathUtils;
 import com.weghst.setaria.core.util.ZooKeeperException;
 
 /**
@@ -42,8 +44,8 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
 
     private static final Logger LOG = LoggerFactory.getLogger(AppServiceImpl.class);
 
-    private static final String PULL_CONFIG_URL_NODE_PATH = "/url";
-    private static final String APP_PARENT_NODE_PATH = "/apps";
+    private static final String PULL_CONFIG_URL_SEGMENT = "/url";
+    private static final String APP_PARENT_SEGMENT = "/apps";
 
     @Autowired
     private AppRepository appRepository;
@@ -71,7 +73,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         createNode(zookeeperBasePath, null);
 
         try {
-            String urlPath = normalizePath(zookeeperBasePath + PULL_CONFIG_URL_NODE_PATH);
+            String urlPath = ZkPathUtils.join(zookeeperBasePath, PULL_CONFIG_URL_SEGMENT);
             Stat stat = curatorFramework.checkExists().forPath(urlPath);
             if (stat == null) {
                 curatorFramework.create().forPath(urlPath, pullConfigUrl.getBytes());
@@ -89,8 +91,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         }
 
         // 创建 apps 节点
-        String appsPath = normalizePath(zookeeperBasePath + APP_PARENT_NODE_PATH);
-        createNode(appsPath, null);
+        createNode(ZkPathUtils.join(zookeeperBasePath, APP_PARENT_SEGMENT), null);
 
         // 创建应用节点
         List<App> apps = appRepository.findAll();
@@ -105,10 +106,10 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
     public void destroy() {
         if (curatorFramework != null) {
             try {
-                String appPath = zookeeperBasePath + APP_PARENT_NODE_PATH;
+                String appPath = ZkPathUtils.join(zookeeperBasePath, APP_PARENT_SEGMENT);
                 List<String> appNames = curatorFramework.getChildren().forPath(appPath);
                 for (String appName : appNames) {
-                    List<String> appEnvs = curatorFramework.getChildren().forPath(appPath + "/" + appName);
+                    List<String> appEnvs = curatorFramework.getChildren().forPath(ZkPathUtils.join(appPath, appName));
                     for (String appEnv : appEnvs) {
                         Env env = Env.valueOf(appEnv);
                         App app = appRepository.findByNameAndEnv(appName, env);
@@ -256,13 +257,6 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
         userAppRepository.saveUserApps(userApps);
     }
 
-    // ----------------------------- Zookeeper ------------------------------------------
-    private String normalizePath(String path) {
-        String normalizedPath = path.replaceAll("//+", "/").replaceFirst("(.+)/$", "$1");
-        PathUtils.validatePath(normalizedPath);
-        return normalizedPath;
-    }
-
     private void createNode(String path, byte[] bytes) {
         try {
             Stat stat = curatorFramework.checkExists().forPath(path);
@@ -279,7 +273,7 @@ public class AppServiceImpl implements AppService, ApplicationListener<ConfigCha
     }
 
     private String getAppNodePath(App app) {
-        return zookeeperBasePath + APP_PARENT_NODE_PATH + "/" + app.getName() + "-" + app.getEnv();
+        return ZkPathUtils.join(zookeeperBasePath, APP_PARENT_SEGMENT, app.getName() + "-" + app.getEnv());
     }
 
     private String createAppNode(App app) {

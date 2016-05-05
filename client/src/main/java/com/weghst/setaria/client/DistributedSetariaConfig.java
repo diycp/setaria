@@ -3,12 +3,10 @@ package com.weghst.setaria.client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.zookeeper.*;
-import org.apache.zookeeper.common.PathUtils;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +18,11 @@ import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.weghst.setaria.client.util.ZkPathUtils;
 
 /**
+ * 分布式配置实现, 该实现依赖于 {@code ZooKeeper}.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class DistributedSetariaConfig extends AbstractSetariaConfig {
@@ -34,61 +35,66 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
-    private static final int SESSION_TIMEOUT = 60 * 1000;
+    private static final int DEFAULT_SESSION_TIMEOUT = 60 * 1000;
     private static final String DEFAULT_BASE_PATH = "/setaria";
-    private static final String URL_NODE_PATH = "/url";
-    private static final String APPS_NODE_PATH = "/apps";
-    private static final String CLIENT_NODE_PATH = "/client-";
+    private static final String URL_SEGMENT = "/url";
+    private static final String APP_PARENT_SEGMENT = "/apps";
+    private static final String CLIENT_NODE_PREFIX = "/client-";
 
     /**
-     *
+     * ZooKeeper 连接字符串.
      */
     public static final String CONFIG_ZOOKEEPER_CONNECT_STRING = "setaria.config.zookeeper.connectString";
     /**
-     *
+     * ZooKeeper 会话超时时间(ms), 默认为 60s.
+     */
+    public static final String CONFIG_ZOOKEEPER_SESSION_TIMEOUT = "setaria.config.zookeeper.sessionTimeout";
+    /**
+     * ZooKeeper 中配置根目录, 默认为 /setaria.
      */
     public static final String CONFIG_BASE_PATH = "setaria.config.zookeeper.basePath";
     /**
-     *
+     * 配置应用名称.
      */
-    public static final String CONFIG_APP = "setaria.config.zookeeper.app";
+    public static final String CONFIG_APP = "setaria.config.app";
     /**
-     *
+     * 配置应用环境.
      */
-    public static final String CONFIG_ENV = "setaria.config.zookeeper.env";
+    public static final String CONFIG_ENV = "setaria.config.env";
 
     private ZooKeeper zooKeeper;
     private ConfigProvider configProvider;
-    private String basePath;
-    private String path;
+
     private String app;
     private String env;
+    private String urlNodePath;
+    private String appNodePath;
 
-    /**
-     * @param configParameters
-     */
     public DistributedSetariaConfig(Map<String, String> configParameters) {
         super(configParameters);
 
         String connectString = getConfigParameter(CONFIG_ZOOKEEPER_CONNECT_STRING);
-        basePath = configParameters.get(CONFIG_BASE_PATH);
+        String basePath = configParameters.get(CONFIG_BASE_PATH);
         if (basePath == null || basePath.isEmpty()) {
             basePath = DEFAULT_BASE_PATH;
         }
         app = getConfigParameter(CONFIG_APP);
         env = getConfigParameter(CONFIG_ENV);
 
-        // FIXME 优化
-        path = normalizePath(Paths.get(basePath, APPS_NODE_PATH, app + "-" + env).toString());
+        appNodePath = ZkPathUtils.join(basePath, APP_PARENT_SEGMENT, app + "-" + env);
+        urlNodePath = ZkPathUtils.join(basePath, URL_SEGMENT);
+        LOG.debug("分布式配置参数 connectString: {}, path: {}", connectString, appNodePath);
 
-        LOG.debug("分布式配置参数 connectString: {}, path: {}", connectString, path);
-        PathUtils.validatePath(path);
+        int sessionTimeout = DEFAULT_SESSION_TIMEOUT;
+        if (configParameters.containsKey(CONFIG_ZOOKEEPER_SESSION_TIMEOUT)) {
+            sessionTimeout = Integer.parseInt(configParameters.get(CONFIG_ZOOKEEPER_SESSION_TIMEOUT));
+        }
 
         try {
-            zooKeeper = new ZooKeeper(connectString, SESSION_TIMEOUT, new Watcher() {
+            zooKeeper = new ZooKeeper(connectString, sessionTimeout, new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
-                    if (path.equals(event.getPath()) && event.getType() == Event.EventType.NodeDataChanged) {
+                    if (appNodePath.equals(event.getPath()) && event.getType() == Event.EventType.NodeDataChanged) {
                         refresh();
                     }
                 }
@@ -136,7 +142,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
     private String getUrl() {
         Stat stat = new Stat();
         try {
-            byte[] bytes = zooKeeper.getData(normalizePath(basePath + URL_NODE_PATH), false, stat);
+            byte[] bytes = zooKeeper.getData(urlNodePath, false, stat);
             String url = new String(bytes);
 
             LOG.debug("配置服务器地址[{}], STAT: {}", url, stat);
@@ -150,7 +156,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
     private void refresh0() {
         Stat stat = new Stat();
         try {
-            byte[] bytes = zooKeeper.getData(path, true, stat);
+            byte[] bytes = zooKeeper.getData(appNodePath, true, stat);
             loadConfigs();
         } catch (Exception e) {
             throw new SetariaConfigException(e);
@@ -177,7 +183,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         }
 
         try {
-            zooKeeper.create(normalizePath(path + CLIENT_NODE_PATH), bytes, ZooDefs.Ids.READ_ACL_UNSAFE,
+            zooKeeper.create(ZkPathUtils.join(appNodePath, CLIENT_NODE_PREFIX), bytes, ZooDefs.Ids.READ_ACL_UNSAFE,
                     CreateMode.EPHEMERAL_SEQUENTIAL);
         } catch (Exception e) {
             LOG.error("向 ZooKeeper 提交客户端信息错误 ->> {}", clientInfo, e);
@@ -215,11 +221,4 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
 
         refreshZkClientInfo();
     }
-
-    private String normalizePath(String path) {
-        String normalizedPath = path.replaceAll("//+", "/").replaceAll("\\\\", "/").replaceFirst("(.+)/$", "$1");
-        PathUtils.validatePath(normalizedPath);
-        return normalizedPath;
-    }
-
 }

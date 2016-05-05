@@ -23,6 +23,8 @@ import com.weghst.setaria.core.service.UserNotFoundException;
 import com.weghst.setaria.core.service.UserService;
 
 /**
+ * 管理平台控制器.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 @Controller

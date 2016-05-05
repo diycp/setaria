@@ -1,6 +1,7 @@
 package com.weghst.setaria.client.spring;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -27,9 +28,12 @@ import com.weghst.setaria.client.SetariaConfigListener;
 import com.weghst.setaria.client.annotation.ConfigValue;
 
 /**
+ * {@link ConfigValue} 注解处理器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
-public class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered, ApplicationListener<ApplicationContextEvent> {
+public class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered,
+        ApplicationListener<ApplicationContextEvent> {
 
     private final SimpleTypeConverter typeConverter = new SimpleTypeConverter();
     private final PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(
@@ -39,7 +43,9 @@ public class ConfigValueBeanPostProcessor implements BeanPostProcessor, Priority
     private ListableBeanFactory beanFactory;
 
     /**
+     * 通过 {@link ListableBeanFactory} 创建处理器实例.
      *
+     * @param beanFactory {@link ListableBeanFactory}
      */
     public ConfigValueBeanPostProcessor(ListableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
@@ -63,6 +69,25 @@ public class ConfigValueBeanPostProcessor implements BeanPostProcessor, Priority
 
     private void doPostProcessInitialization(final Object bean) {
         Class<?> clazz = bean.getClass();
+        ReflectionUtils.doWithMethods(clazz, new ReflectionUtils.MethodCallback() {
+
+            @Override
+            public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+                ConfigValue configValue = AnnotationUtils.getAnnotation(method, ConfigValue.class);
+                if (configValue == null) {
+                    return;
+                }
+
+                if (method.getParameterTypes().length != 1) {
+                    throw new IllegalStateException("@ConfigValue 注解只能用于 1 个参数的方法");
+                }
+
+                String str = propertyResolver.resolvePlaceholders(configValue.value());
+                Object newValue = typeConverter.convertIfNecessary(str, method.getParameterTypes()[0]);
+                ReflectionUtils.invokeMethod(method, bean, newValue);
+            }
+        });
+
         ReflectionUtils.doWithFields(clazz, new ReflectionUtils.FieldCallback() {
             @Override
             public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -92,7 +117,7 @@ public class ConfigValueBeanPostProcessor implements BeanPostProcessor, Priority
     }
 
     /**
-     *
+     * {@link SetariaConfig} 配置刷新监听器, 用于刷新 Spring 所管理对象的配置属性值.
      */
     private class RefreshedSetariaConfigListener implements SetariaConfigListener {
 
@@ -136,5 +161,4 @@ public class ConfigValueBeanPostProcessor implements BeanPostProcessor, Priority
             return (Iterator<PropertySource<?>>) propertySourceList.iterator();
         }
     }
-
 }

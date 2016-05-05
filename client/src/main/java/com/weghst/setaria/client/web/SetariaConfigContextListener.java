@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -16,21 +17,25 @@ import com.weghst.setaria.client.SetariaConfigContext;
 import com.weghst.setaria.client.SetariaConfigException;
 
 /**
+ * Web 应用监听器初始化 {@code SetariaConfig}.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 public class SetariaConfigContextListener implements ServletContextListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SetariaConfigContextListener.class);
-    public static final String CONFIG_CLASS = "setaria.config.class";
+    /**
+     * {@link SetariaConfig} 实现类.
+     */
+    public static final String SETARIA_CONFIG_IMPLEMENTATION = "setaria.config.implementation";
 
+    private static final Logger LOG = LoggerFactory.getLogger(SetariaConfigContextListener.class);
     private SetariaConfig setariaConfig;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        // zookeeper://127.0.0.1:8080,198.153.2.3:9090
         ServletContext sc = servletContextEvent.getServletContext();
 
-        String configClass = sc.getInitParameter(CONFIG_CLASS);
+        String configClass = sc.getInitParameter(SETARIA_CONFIG_IMPLEMENTATION);
         setariaConfig = newSetariaConfig(configClass, getInitParameters(sc));
 
         // 初始化配置
@@ -44,7 +49,6 @@ public class SetariaConfigContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         if (setariaConfig != null) {
-
             LOG.debug("销毁 SetariaConfig");
             setariaConfig.destroy();
         }

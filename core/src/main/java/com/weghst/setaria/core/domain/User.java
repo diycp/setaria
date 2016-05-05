@@ -3,17 +3,33 @@ package com.weghst.setaria.core.domain;
 import java.io.Serializable;
 
 /**
+ * 用户实体.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 public class User implements Serializable {
 
     private static final long serialVersionUID = -5331182262867932385L;
 
-
+    /**
+     * 主键.
+     */
     private int id;
+    /**
+     * 邮箱.
+     */
     private String email;
+    /**
+     * 密码.
+     */
     private String password;
+    /**
+     * 创建时间.
+     */
     private long createdTime;
+    /**
+     * 用户是否为管理员.
+     */
     private boolean manager;
 
     public int getId() {

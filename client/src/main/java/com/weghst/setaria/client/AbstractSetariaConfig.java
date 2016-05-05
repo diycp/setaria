@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 抽象的 {@link SetariaConfig} 实现.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public abstract class AbstractSetariaConfig implements SetariaConfig {
@@ -58,15 +60,27 @@ public abstract class AbstractSetariaConfig implements SetariaConfig {
         return listeners.remove(listener);
     }
 
+    /**
+     * init.
+     */
     protected abstract void doInit();
 
+    /**
+     * refresh.
+     */
     protected abstract void doRefresh();
 
+    /**
+     * destory.
+     */
     protected abstract void doDestroy();
 
     /**
-     * @param name
-     * @return
+     * 通过名称获取初始化参数.
+     *
+     * @param name 参数名称
+     * @return String
+     * @throws IllegalArgumentException 如果属性名称不存在对应的初始化参数
      */
     protected String getConfigParameter(String name) throws IllegalArgumentException {
         String parameter = configParameters.get(name);

@@ -17,6 +17,8 @@ import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.UserService;
 
 /**
+ * 用户控制器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @Controller

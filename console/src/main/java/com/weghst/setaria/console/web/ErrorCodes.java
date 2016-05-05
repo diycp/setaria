@@ -1,6 +1,8 @@
 package com.weghst.setaria.console.web;
 
 /**
+ * 错码码定义.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public enum ErrorCodes {
@@ -22,10 +24,20 @@ public enum ErrorCodes {
         this.message = message;
     }
 
+    /**
+     * 返回错误码.
+     *
+     * @return 错误码
+     */
     public int getCode() {
         return code;
     }
 
+    /**
+     * 返回错误描述.
+     *
+     * @return 错误描述
+     */
     public String getMessage() {
         return message;
     }

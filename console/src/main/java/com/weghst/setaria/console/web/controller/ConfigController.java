@@ -1,6 +1,7 @@
 package com.weghst.setaria.console.web.controller;
 
 import java.util.Arrays;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.ConfigService;
 
 /**
+ * 配置控制器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @Controller

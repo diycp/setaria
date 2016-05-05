@@ -20,7 +20,7 @@ import java.math.BigInteger;
 import java.util.Properties;
 
 /**
- * 系统参数/业务参数提供者接口定义.
+ * 业务参数提供者接口定义.
  *
  * @author Kevin Zou (kevinz@weghst.com)
  */
@@ -29,146 +29,146 @@ public interface ConfigProvider {
     /**
      * 判断是否有配置指定参数.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return boolean
      */
-    boolean containsKey(String name);
+    boolean containsKey(String key);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code false}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return boolean
      */
-    boolean getBoolean(String name) throws ConfigNotFoundException, WrongConfigValueException;
+    boolean getBoolean(String key) throws ConfigNotFoundException, WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return boolean
      */
-    boolean getBoolean(String name, boolean defaultValue);
+    boolean getBoolean(String key, boolean defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return int
      */
-    int getInt(String name) throws ConfigNotFoundException, WrongConfigValueException;
+    int getInt(String key) throws ConfigNotFoundException, WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return int
      */
-    int getInt(String name, int defaultValue);
+    int getInt(String key, int defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return long
      */
-    long getLong(String name) throws ConfigNotFoundException, WrongConfigValueException;
+    long getLong(String key) throws ConfigNotFoundException, WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return long
      */
-    long getLong(String name, long defaultValue);
+    long getLong(String key, long defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return float
      */
-    float getFloat(String name) throws ConfigNotFoundException, WrongConfigValueException;
+    float getFloat(String key) throws ConfigNotFoundException, WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return float
      */
-    float getFloat(String name, float defaultValue);
+    float getFloat(String key, float defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return double
      */
-    double getDouble(String name) throws ConfigNotFoundException, WrongConfigValueException;
+    double getDouble(String key) throws ConfigNotFoundException, WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return double
      */
-    double getDouble(String name, double defaultValue);
+    double getDouble(String key, double defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return String
      */
-    String getString(String name);
+    String getString(String key);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return String
      */
-    String getString(String name, String defaultValue);
+    String getString(String key, String defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return BigDecimal
      */
-    BigDecimal getBigDecimal(String name) throws WrongConfigValueException;
+    BigDecimal getBigDecimal(String key) throws WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return BigDecimal
      */
-    BigDecimal getBigDecimal(String name, String defaultValue);
+    BigDecimal getBigDecimal(String key, String defaultValue);
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return BigInteger
      */
-    BigInteger getBigInteger(String name) throws WrongConfigValueException;
+    BigInteger getBigInteger(String key) throws WrongConfigValueException;
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key          属性名称
      * @param defaultValue 默认值
      * @return BigInteger
      */
-    BigInteger getBigInteger(String name, String defaultValue);
+    BigInteger getBigInteger(String key, String defaultValue);
 
     /**
      * @return

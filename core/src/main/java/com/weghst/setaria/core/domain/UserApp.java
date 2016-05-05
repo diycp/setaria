@@ -3,14 +3,25 @@ package com.weghst.setaria.core.domain;
 import java.io.Serializable;
 
 /**
+ * 用户应用映射实体.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class UserApp implements Serializable {
 
     private static final long serialVersionUID = 1515460880439336865L;
 
+    /**
+     * 主键.
+     */
     private int id;
+    /**
+     * 用户 ID.
+     */
     private int userId;
+    /**
+     * 应用 ID.
+     */
     private int appId;
 
     public int getId() {

@@ -10,20 +10,18 @@ import java.util.Properties;
 import org.springframework.util.ResourceUtils;
 
 /**
+ * Properties 文件配置.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class FileSetariaConfig extends AbstractSetariaConfig {
 
     /**
-     *
+     * 配置文件路径 {@link ResourceUtils}.
      */
     public static final String SETARIA_CONFIG_LOCATION = "setaria.config.location";
-
     private ConfigProvider configProvider;
 
-    /**
-     * @param configParameters
-     */
     public FileSetariaConfig(Map<String, String> configParameters) {
         super(configParameters);
     }

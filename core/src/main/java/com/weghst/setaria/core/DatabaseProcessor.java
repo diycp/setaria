@@ -10,6 +10,9 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 /**
+ * 数据库版本管理处理器. {@code DatabaseProcessor} 依赖于 {@link DataSource} bean 对象初始化完成. 该对象由 Spring
+ * 管理时的 {@code id} 必须设置为 {@code dataSource}.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @Component

@@ -28,7 +28,13 @@ public class ConfigChangedHistory implements Serializable {
      * 主键.
      */
     private int id;
+    /**
+     * 应用名称.
+     */
     private String appName;
+    /**
+     * 应用环境.
+     */
     private Env appEnv;
     /**
      * 配置 ID.

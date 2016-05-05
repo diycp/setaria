@@ -8,16 +8,16 @@ import com.weghst.setaria.client.WrongConfigValueException;
 public abstract class AbstractValueConverter<T> implements ValueConverter<T> {
 
     @Override
-    public T convert(String name, String value) {
+    public T convert(String key, String value) {
         try {
             return doConvert(value);
         } catch (Exception e) {
-            throw new WrongConfigValueException(name, value, e);
+            throw new WrongConfigValueException(key, value, e);
         }
     }
 
     @Override
-    public T convert(String name, String value, T defaultValue) {
+    public T convert(String key, String value, T defaultValue) {
         if (value == null) {
             return defaultValue;
         }
@@ -31,8 +31,10 @@ public abstract class AbstractValueConverter<T> implements ValueConverter<T> {
     }
 
     /**
-     * @param value
-     * @return
+     * 将属性值转换为目标类型.
+     *
+     * @param value 值
+     * @return 值
      */
     protected abstract T doConvert(String value);
 }

@@ -2,6 +2,7 @@ package com.weghst.setaria.console.web;
 
 import java.io.File;
 import java.util.EnumSet;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
 
@@ -14,6 +15,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import ch.qos.logback.ext.spring.web.WebLogbackConfigurer;
 
 /**
+ * Web 配置监听器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @WebListener

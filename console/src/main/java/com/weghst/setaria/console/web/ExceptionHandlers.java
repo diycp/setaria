@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
+ * Spring 异常处理器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @ControllerAdvice

@@ -1,6 +1,8 @@
 package com.weghst.setaria.core.dto;
 
 /**
+ * 配置传输实体.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class ConfigDto {
