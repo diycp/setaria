@@ -1,7 +1,9 @@
 package com.weghst.setaria.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,39 +54,42 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void save(Config config, String operator) {
-        App app = appRepository.findById(config.getAppId());
-
-        config.setCreatedTime(System.currentTimeMillis());
-        configRepository.save(config);
-
-        // 保存操作历史
-        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(config,
-                ConfigChangedHistory.ACTION_INSERT, operator)
-                .setConfigId(config.getId())
-                .setChanged(configToJson(config));
-        configChangedHistoryRepository.save(configChangedHistory);
+        save0(config, operator);
 
         // 配置更新通知
+        App app = appRepository.findById(config.getAppId());
         applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
     }
 
     @Override
     public void update(Config config, String operator) {
-        Config dbConfig = configRepository.findById(config.getId());
-        App app = appRepository.findById(dbConfig.getAppId());
-
-        config.setLastUpdatedTime(System.currentTimeMillis());
-        configRepository.update(config);
-
-        // 保存操作历史
-        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(dbConfig,
-                ConfigChangedHistory.ACTION_UPDATE, operator)
-                .setOriginal(configToJson(dbConfig))
-                .setChanged(configToJson(config));
-        configChangedHistoryRepository.save(configChangedHistory);
+        update0(config, operator);
 
         // 配置更新通知
+        App app = appRepository.findById(config.getAppId());
         applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
+    }
+
+    @Override
+    public void saveOrUpdate(Config[] configs, String operator) {
+        Set<Integer> appIds = new HashSet<>();
+        Config dbConfig;
+        for (Config config : configs) {
+            dbConfig = configRepository.findByAppIdAndKey(config.getAppId(), config.getKey());
+            if (dbConfig == null) {
+                save0(config, operator);
+            } else {
+                config.setId(dbConfig.getId());
+                update0(config, operator);
+            }
+            appIds.add(config.getAppId());
+        }
+
+        for (int appId : appIds) {
+            // 配置更新通知
+            App app = appRepository.findById(appId);
+            applicationEventPublisher.publishEvent(new ConfigChangedEvent(app));
+        }
     }
 
     @Override
@@ -140,6 +145,31 @@ public class ConfigServiceImpl implements ConfigService {
             list.add(configDto);
         }
         return list;
+    }
+
+    private void save0(Config config, String operator) {
+        config.setCreatedTime(System.currentTimeMillis());
+        configRepository.save(config);
+
+        // 保存操作历史
+        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(config,
+                ConfigChangedHistory.ACTION_INSERT, operator)
+                .setConfigId(config.getId())
+                .setChanged(configToJson(config));
+        configChangedHistoryRepository.save(configChangedHistory);
+    }
+
+    private void update0(Config config, String operator) {
+        Config dbConfig = configRepository.findById(config.getId());
+        config.setLastUpdatedTime(System.currentTimeMillis());
+        configRepository.update(config);
+
+        // 保存操作历史
+        ConfigChangedHistory configChangedHistory = newConfigChangedHistory(dbConfig,
+                ConfigChangedHistory.ACTION_UPDATE, operator)
+                .setOriginal(configToJson(dbConfig))
+                .setChanged(configToJson(config));
+        configChangedHistoryRepository.save(configChangedHistory);
     }
 
     private void delete0(Config config, String operator) {

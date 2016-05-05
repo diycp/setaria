@@ -10,6 +10,17 @@
                 }
             ]
         });
+
+        $('#configs-import-file').AjaxFileUpload({
+            action: 'p/configs/import/${app.id}',
+            onComplete: function (filename, response) {
+                if (response.errorCode) {
+                    $.alert({content: response.errorMessage});
+                } else {
+                    angular.element('#configList').scope().refresh();
+                }
+            }
+        });
     });
 
     function showConfigDetails(id) {
@@ -51,7 +62,12 @@
                 <i class="am-icon-plus"></i>添加</a>
             <a href ng-click="export(${app.id})" class="am-btn am-btn-xs am-btn-primary am-fr">
                 <i class="am-icon-download"></i>导出</a>
-            <a disabled class="am-btn am-btn-xs am-btn-primary am-fr"><i class="am-icon-upload"></i>导入</a>
+
+            <div class="am-form-group am-form-file">
+                <a href class="am-btn am-btn-xs am-btn-primary am-fr">
+                    <i class="am-icon-upload"></i>导入</a>
+                <input id="configs-import-file" name="file" type="file"/>
+            </div>
         </div>
     </div>
     <div class="am-panel-bd">

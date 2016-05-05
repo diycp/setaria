@@ -21,6 +21,10 @@
         SELECT * FROM t_config WHERE id=#{value}
     </select>
 
+    <select id="findByAppIdAndKey" resultType="com.weghst.setaria.core.domain.Config">
+        SELECT * FROM t_config WHERE `key`=#{key} AND appId=#{appId}
+    </select>
+
     <select id="findByAppId" resultType="com.weghst.setaria.core.domain.Config">
         SELECT * FROM t_config WHERE appId=#{value}
     </select>

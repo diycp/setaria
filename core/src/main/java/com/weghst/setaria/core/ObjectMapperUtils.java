@@ -1,6 +1,7 @@
 package com.weghst.setaria.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +37,20 @@ public final class ObjectMapperUtils {
     public static <T> T readValue(byte[] content, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(content, valueType);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * @param src
+     * @param valueType
+     * @param <T>
+     * @return
+     */
+    public static <T> T readValue(InputStream src, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(src, valueType);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

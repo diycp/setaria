@@ -11,6 +11,7 @@
     <script src="js/angular-ui-router.min.js"></script>
     <script src="js/dateFormat.js"></script>
     <script src="js/ocLazyLoad.min.js"></script>
+    <script src="js/jquery.ajaxfileupload.js"></script>
     <script src="js/jquery.fileDownload.js"></script>
 
     <!-- Amaze UI 基础 -->

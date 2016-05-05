@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.weghst.setaria.console.web.Constants;
@@ -98,8 +99,29 @@ public class ConfigController {
         }
     }
 
+    @RequestMapping(value = "import/{appId}")
+    @ResponseBody
+    public Object importConfig(@PathVariable int appId, @RequestParam("file") MultipartFile multipartFile,
+                               HttpSession session) {
+        try {
+            Config[] configs = ObjectMapperUtils.readValue(multipartFile.getInputStream(), Config[].class);
+            for (Config config : configs) {
+                config.setAppId(appId);
+            }
+
+            User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
+            configService.saveOrUpdate(configs, user.getEmail());
+            return Result.SUCCESS;
+        } catch (Exception e) {
+            ErrorResult errorResult = new ErrorResult();
+            errorResult.setErrorCode(ErrorCodes.UNKNOWN.getCode());
+            errorResult.setErrorMessage("上传文件失败 ->> " + e.getMessage());
+            return errorResult;
+        }
+    }
+
     @RequestMapping(value = "export/{appId}", method = RequestMethod.GET)
-    public void export(@PathVariable int appId, HttpServletResponse response) throws IOException {
+    public void exportConfig(@PathVariable int appId, HttpServletResponse response) throws IOException {
         List<Config> list = configService.findByAppId(appId);
         List<ConfigDto> configDtos = new ArrayList<>(list.size());
         for (Config c : list) {

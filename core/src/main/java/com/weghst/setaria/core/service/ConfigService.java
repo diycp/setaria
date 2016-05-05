@@ -30,6 +30,14 @@ public interface ConfigService {
     void update(Config config, String operator);
 
     /**
+     * 保存或者更新配置信息.
+     *
+     * @param configs  配置信息列表
+     * @param operator 操作员
+     */
+    void saveOrUpdate(Config[] configs, String operator);
+
+    /**
      * 删除配置信息.
      *
      * @param id       配置信息

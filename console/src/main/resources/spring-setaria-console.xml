@@ -106,4 +106,6 @@
         <property name="requestContextAttribute" value="rc"/>
     </bean>
 
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
 </beans>

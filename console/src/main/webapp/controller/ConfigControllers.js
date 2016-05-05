@@ -26,6 +26,10 @@
                 alert("导出失败");
             });
         }
+
+        $scope.refresh = function () {
+            $state.go($state.current, {}, {reload: true});
+        }
     });
 
     module.controller('ConfigAddController', function ($scope, $http, $state, $stateParams) {

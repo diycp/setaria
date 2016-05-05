@@ -6,8 +6,8 @@
 
             <div class="am-form-group">
                 <label for="name">名称：</label>
-                <input type="text" id="name" ng-model="app.name" placeholder="应用名称6至30字字符, 且只能为字母数字下划线及点"
-                       required pattern="^([a-z]|[A-Z]|[0-9]|[_\.]){6,30}$"/>
+                <input type="text" id="name" ng-model="app.name" placeholder="应用名称4至30字字符, 且只能为字母数字下划线及点"
+                       required pattern="^([a-z]|[A-Z]|[0-9]|[_\.]){4,30}$"/>
             </div>
             <div class="am-form-group">
                 <label for="env">环境：</label>
