@@ -17,5 +17,6 @@ project(':client') {
         }
 
         testCompile 'org.springframework:spring-test:3.2.16.RELEASE'
+        testCompile 'ch.qos.logback:logback-classic:1.1.3'
     }
 }
