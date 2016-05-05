@@ -7,6 +7,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
+ * 登录验证拦截器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class LoginValidatingInterceptor extends HandlerInterceptorAdapter {

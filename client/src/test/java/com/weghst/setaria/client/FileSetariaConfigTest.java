@@ -38,22 +38,19 @@ public class FileSetariaConfigTest extends AbstractTestNGSpringContextTests {
     private TestConfigBean testConfigBean;
 
     @BeforeSuite
-    public void beforeSuite() {
+    public void beforeSuite() throws IOException {
+        Properties properties = new Properties();
+        properties.setProperty("test.first", "Test First");
+        properties.setProperty("test.second", "Test Second");
+
+        storeProperties(properties);
+
         Map<String, String> configParameters = new HashMap<>();
         configParameters.put(FileSetariaConfig.SETARIA_CONFIG_LOCATION, PROPERTIES_PATH.toString());
 
         setariaConfig = new FileSetariaConfig(configParameters);
         setariaConfig.init();
         SetariaConfigContext.setSetariaConfig(setariaConfig);
-    }
-
-    @BeforeClass
-    public void beforeClass() throws Exception {
-        Properties properties = new Properties();
-        properties.setProperty("test.first", "Test First");
-        properties.setProperty("test.second", "Test Second");
-
-        storeProperties(properties);
     }
 
     @Test
@@ -84,8 +81,14 @@ public class FileSetariaConfigTest extends AbstractTestNGSpringContextTests {
 
         @ConfigValue("${test.first}")
         private String first;
+        private String second;
         @ConfigValue("${test.third:Default Value}")
         private String third;
+
+        @ConfigValue("${test.second:HELLO}")
+        public void setSecond(String second) {
+            this.second = second;
+        }
     }
 
 }

@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user) {
+        User dbUser = findById(user.getId());
+        if (root.equals(dbUser.getEmail())) {
+            throw new RuntimeException("ROOT 用户不能修改");
+        }
+
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         userRepository.update(user);
     }
@@ -67,6 +72,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(User user, int[] appIds) {
         User dbUser = findById(user.getId());
+        if (root.equals(dbUser.getEmail())) {
+            throw new RuntimeException("ROOT 用户不能修改");
+        }
+
         if (!ObjectUtils.nullSafeEquals(user.getEmail(), dbUser.getEmail())) {
             dbUser.setEmail(user.getEmail());
         }
@@ -131,7 +140,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public User authenticate(String email, String password) {
+    public User authenticate(String email, String password) throws UserNotFoundException, PasswordNotMatchedException {
         User user = findByEmail(email);
         if (user == null) {
             throw new UserNotFoundException("未找到邮箱为 [" + email + "] 的用户");

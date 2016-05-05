@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
+ * {@link ObjectMapper} 工具类.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public final class ObjectMapperUtils {
@@ -18,14 +20,18 @@ public final class ObjectMapperUtils {
     {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         OBJECT_MAPPER.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         OBJECT_MAPPER.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
     }
 
     /**
-     * @param content
-     * @param valueType
-     * @param <T>
-     * @return
+     * {@link ObjectMapper#readValue(byte[], Class)}
+     *
+     * @param content   JSON 字节数组
+     * @param valueType 数据类型
+     * @param <T>       数据类型
+     * @return 数据对象
      */
     public static <T> T readValue(byte[] content, Class<T> valueType) {
         try {
@@ -36,8 +42,10 @@ public final class ObjectMapperUtils {
     }
 
     /**
-     * @param value
-     * @return
+     * {@link ObjectMapper#writeValueAsBytes(Object)}.
+     *
+     * @param value 数据对象
+     * @return JSON 字节数组
      */
     public static byte[] writeValueAsBytes(Object value) {
         try {
@@ -48,9 +56,10 @@ public final class ObjectMapperUtils {
     }
 
     /**
+     * {@link ObjectMapper#writeValueAsBytes(Object)}.
      *
-     * @param value
-     * @return
+     * @param value 数据对象
+     * @return JSON 字符串
      */
     public static String writeValueAsString(Object value) {
         try {
@@ -60,6 +69,11 @@ public final class ObjectMapperUtils {
         }
     }
 
+    /**
+     * 返回 {@link ObjectMapper} 实例.
+     *
+     * @return {@link ObjectMapper}
+     */
     public static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
     }

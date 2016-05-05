@@ -3,7 +3,7 @@
 <head>
     <base href="${rc.contextPath}/">
     <meta charset="UTF-8">
-    <title>Setaria 统一配置管理</title>
+    <title>Setaria 分布式统一配置管理</title>
 
     <!-- 基础库 -->
     <script src="js/jquery.min.js"></script>
@@ -75,7 +75,7 @@
 <header class="am-topbar am-topbar-inverse admin-header">
     <div class="am-topbar-brand">
         <strong>Setaria</strong>
-        <small>统一配置管理</small>
+        <small>分布式统一配置管理</small>
     </div>
 
     <div class="am-collapse am-topbar-collapse" id="topbar-collapse">

@@ -1,49 +1,47 @@
 package com.weghst.setaria.client;
 
 /**
+ * 错误的配置属性值异常.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class WrongConfigValueException extends RuntimeException {
 
-    private String propertyName;
-    private String propertyValue;
+    private String key;
+    private String value;
 
     /**
-     * @param propertyName
-     * @param propertyValue
+     * 通过配置键, 值与目标异常构建异常.
+     *
+     * @param key   配置键
+     * @param value 配置值
+     * @param cause 目标异常
      */
-    public WrongConfigValueException(String propertyName, String propertyValue) {
-        super(formatMessage(propertyName, propertyValue));
-        this.propertyName = propertyName;
-        this.propertyValue = propertyValue;
+    public WrongConfigValueException(String key, String value, Throwable cause) {
+        super(formatMessage(key, value), cause);
+        this.key = key;
+        this.value = value;
     }
 
     /**
-     * @param propertyName
-     * @param propertyValue
-     * @param cause
+     * 返回属性值错误的键.
+     *
+     * @return 键
      */
-    public WrongConfigValueException(String propertyName, String propertyValue, Throwable cause) {
-        super(formatMessage(propertyName, propertyValue), cause);
-        this.propertyName = propertyName;
-        this.propertyValue = propertyValue;
+    public String getKey() {
+        return key;
     }
 
     /**
-     * @return
+     * 返回错误的属性值.
+     *
+     * @return 值
      */
-    public String getPropertyName() {
-        return propertyName;
-    }
-
-    /**
-     * @return
-     */
-    public String getPropertyValue() {
-        return propertyValue;
+    public String getValue() {
+        return value;
     }
 
     private static String formatMessage(String propertyName, String propertyValue) {
-        return String.format("错误的属性配置[%s: %s]", propertyName, propertyValue);
+        return String.format("错误的属性配置 [%s: %s]", propertyName, propertyValue);
     }
 }

@@ -15,179 +15,179 @@ public final class Configs {
     /**
      * 判断是否有配置指定参数.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return boolean
      */
-    public static boolean containsKey(String name) {
-        return getProvider().containsKey(name);
+    public static boolean containsKey(String key) {
+        return getProvider().containsKey(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code false}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return boolean
      */
-    public static boolean getBoolean(String name) throws ConfigNotFoundException, WrongConfigValueException {
-        return getProvider().getBoolean(name);
+    public static boolean getBoolean(String key) throws ConfigNotFoundException, WrongConfigValueException {
+        return getProvider().getBoolean(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return boolean
      */
-    public static boolean getBoolean(String name, boolean defaultValue) {
-        return getProvider().getBoolean(name, defaultValue);
+    public static boolean getBoolean(String key, boolean defaultValue) {
+        return getProvider().getBoolean(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return int
      */
-    public static int getInt(String name) throws ConfigNotFoundException, WrongConfigValueException {
-        return getProvider().getInt(name);
+    public static int getInt(String key) throws ConfigNotFoundException, WrongConfigValueException {
+        return getProvider().getInt(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return int
      */
-    public static int getInt(String name, int defaultValue) {
-        return getProvider().getInt(name, defaultValue);
+    public static int getInt(String key, int defaultValue) {
+        return getProvider().getInt(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return long
      */
-    public static long getLong(String name) throws ConfigNotFoundException, WrongConfigValueException {
-        return getProvider().getLong(name);
+    public static long getLong(String key) throws ConfigNotFoundException, WrongConfigValueException {
+        return getProvider().getLong(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return long
      */
-    public static long getLong(String name, long defaultValue) {
-        return getProvider().getLong(name, defaultValue);
+    public static long getLong(String key, long defaultValue) {
+        return getProvider().getLong(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return float
      */
-    public static float getFloat(String name) throws ConfigNotFoundException, WrongConfigValueException {
-        return getProvider().getFloat(name);
+    public static float getFloat(String key) throws ConfigNotFoundException, WrongConfigValueException {
+        return getProvider().getFloat(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return float
      */
-    public static float getFloat(String name, float defaultValue) {
-        return getProvider().getFloat(name, defaultValue);
+    public static float getFloat(String key, float defaultValue) {
+        return getProvider().getFloat(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code 0}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return double
      */
-    public static double getDouble(String name) throws ConfigNotFoundException, WrongConfigValueException {
-        return getProvider().getDouble(name);
+    public static double getDouble(String key) throws ConfigNotFoundException, WrongConfigValueException {
+        return getProvider().getDouble(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return double
      */
-    public static double getDouble(String name, double defaultValue) {
-        return getProvider().getDouble(name, defaultValue);
+    public static double getDouble(String key, double defaultValue) {
+        return getProvider().getDouble(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return String
      */
-    public static String getString(String name) {
-        return getProvider().getString(name);
+    public static String getString(String key) {
+        return getProvider().getString(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return String
      */
-    public static String getString(String name, String defaultValue) {
-        return getProvider().getString(name, defaultValue);
+    public static String getString(String key, String defaultValue) {
+        return getProvider().getString(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return BigDecimal
      */
-    public static BigDecimal getBigDecimal(String name) throws WrongConfigValueException {
-        return getProvider().getBigDecimal(name);
+    public static BigDecimal getBigDecimal(String key) throws WrongConfigValueException {
+        return getProvider().getBigDecimal(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return BigDecimal
      */
-    public static BigDecimal getBigDecimal(String name, String defaultValue) {
-        return getProvider().getBigDecimal(name, defaultValue);
+    public static BigDecimal getBigDecimal(String key, String defaultValue) {
+        return getProvider().getBigDecimal(key, defaultValue);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回{@code null}.
      *
-     * @param name 属性名称
+     * @param key 属性名称
      * @return BigInteger
      */
-    public static BigInteger getBigInteger(String name) throws WrongConfigValueException {
-        return getProvider().getBigInteger(name);
+    public static BigInteger getBigInteger(String key) throws WrongConfigValueException {
+        return getProvider().getBigInteger(key);
     }
 
     /**
      * 返回指定属性名称的参数值, 如果不存在则返回指定的默认值.
      *
-     * @param name         属性名称
+     * @param key         属性名称
      * @param defaultValue 默认值
      * @return BigInteger
      */
-    public static BigInteger getBigInteger(String name, String defaultValue) {
-        return getProvider().getBigInteger(name, defaultValue);
+    public static BigInteger getBigInteger(String key, String defaultValue) {
+        return getProvider().getBigInteger(key, defaultValue);
     }
 
     private static ConfigProvider getProvider() {

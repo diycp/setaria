@@ -7,64 +7,87 @@ import com.weghst.setaria.core.domain.App;
 import com.weghst.setaria.core.dto.ClientInfo;
 
 /**
+ * 应用逻辑接口定义.
+ *
  * @author Kevin Zou (zouyong@shzhiduan.com)
  */
 public interface AppService {
 
     /**
-     * @param app
+     * 保存应用.
+     *
+     * @param app 应用
      */
     void save(App app);
 
     /**
-     * @param app
-     * @param userIds
+     * 保存应用且添加关联应用所属用户.
+     *
+     * @param app     应用
+     * @param userIds 用户 ID
      */
     void save(App app, int[] userIds);
 
     /**
-     * @param app
+     * 更新应用.
+     *
+     * @param app 应用
      */
     void update(App app);
 
     /**
-     * @param app
-     * @param userIds
+     * 更新应用且更新关联应用所属用户.
+     *
+     * @param app     应用
+     * @param userIds 用户 ID
      */
     void update(App app, int[] userIds);
 
     /**
-     * @param id
-     * @param operator
+     * 根据应用 ID 删除应用.
+     *
+     * @param id       应用 ID
+     * @param operator 删除应用的操作员
      */
     void deleteById(int id, String operator);
 
     /**
-     * @param id
-     * @return
+     * 根据应用 ID 加载应用详细信息.
+     *
+     * @param id 应用 ID
+     * @return 应用
      */
     App findById(int id);
 
     /**
-     * @param userId
-     * @return
+     * 根据用户 ID 加载应用列表详细信息.
+     *
+     * @param userId 用户 ID
+     * @return 应用列表
      */
     List<App> findAppsByUserId(int userId);
 
     /**
-     * @param userId
-     * @return
+     * 根据用户 ID 或角色加载应用列表详细信息, 如果用户为管理员将返回所有应用列表,
+     * 当用户为普通用户时则返回用户所管理的应用列表.
+     *
+     * @param userId 用户 ID
+     * @return 应用列表
      */
     List<App> findAppsByUserIdOrRole(int userId);
 
     /**
-     * @param appId
-     * @return
+     * 根据应用 ID 查询应用所属用户 ID.
+     *
+     * @param appId 应用 ID
+     * @return 用户 ID
      */
     int[] findAppUserIds(int appId);
 
     /**
-     * @return
+     * 返回所有应用列表.
+     *
+     * @return 应用列表
      */
     List<App> findAll();
 

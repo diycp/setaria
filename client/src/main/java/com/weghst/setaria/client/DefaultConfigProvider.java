@@ -9,9 +9,11 @@ import org.springframework.util.PropertyPlaceholderHelper;
 import com.weghst.setaria.client.converter.*;
 
 /**
+ * 默认的配置提供者实现.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
-public class DefaultConfigProvider implements ConfigProvider {
+class DefaultConfigProvider implements ConfigProvider {
 
     private final static PropertyPlaceholderHelper PLACEHOLDER_HELPER = new PropertyPlaceholderHelper("${", "}");
 
@@ -32,68 +34,68 @@ public class DefaultConfigProvider implements ConfigProvider {
     }
 
     @Override
-    public boolean containsKey(String name) {
-        return getProperties().containsKey(name);
+    public boolean containsKey(String key) {
+        return getProperties().containsKey(key);
     }
 
     @Override
-    public boolean getBoolean(String name) throws ConfigNotFoundException {
-        return BOOLEAN_VALUE_CONVERTER.convert(name, getRequiredProperty(name));
+    public boolean getBoolean(String key) throws ConfigNotFoundException {
+        return BOOLEAN_VALUE_CONVERTER.convert(key, getRequiredProperty(key));
     }
 
     @Override
-    public boolean getBoolean(String name, boolean defaultValue) {
-        return BOOLEAN_VALUE_CONVERTER.convert(name, getProperty(name), defaultValue);
+    public boolean getBoolean(String key, boolean defaultValue) {
+        return BOOLEAN_VALUE_CONVERTER.convert(key, getProperty(key), defaultValue);
     }
 
     @Override
-    public int getInt(String name) throws ConfigNotFoundException {
-        return INT_VALUE_CONVERTER.convert(name, getRequiredProperty(name));
+    public int getInt(String key) throws ConfigNotFoundException {
+        return INT_VALUE_CONVERTER.convert(key, getRequiredProperty(key));
     }
 
     @Override
-    public int getInt(String name, int defaultValue) {
-        return INT_VALUE_CONVERTER.convert(name, getProperty(name), defaultValue);
+    public int getInt(String key, int defaultValue) {
+        return INT_VALUE_CONVERTER.convert(key, getProperty(key), defaultValue);
     }
 
     @Override
-    public long getLong(String name) throws ConfigNotFoundException {
-        return LONG_VALUE_CONVERTER.convert(name, getRequiredProperty(name));
+    public long getLong(String key) throws ConfigNotFoundException {
+        return LONG_VALUE_CONVERTER.convert(key, getRequiredProperty(key));
     }
 
     @Override
-    public long getLong(String name, long defaultValue) {
-        return LONG_VALUE_CONVERTER.convert(name, getProperty(name), defaultValue);
+    public long getLong(String key, long defaultValue) {
+        return LONG_VALUE_CONVERTER.convert(key, getProperty(key), defaultValue);
     }
 
     @Override
-    public float getFloat(String name) throws ConfigNotFoundException {
-        return FLOAT_VALUE_CONVERTER.convert(name, getRequiredProperty(name));
+    public float getFloat(String key) throws ConfigNotFoundException {
+        return FLOAT_VALUE_CONVERTER.convert(key, getRequiredProperty(key));
     }
 
     @Override
-    public float getFloat(String name, float defaultValue) {
-        return FLOAT_VALUE_CONVERTER.convert(name, getProperty(name), defaultValue);
+    public float getFloat(String key, float defaultValue) {
+        return FLOAT_VALUE_CONVERTER.convert(key, getProperty(key), defaultValue);
     }
 
     @Override
-    public double getDouble(String name) throws ConfigNotFoundException {
-        return DOUBLE_VALUE_CONVERTER.convert(name, getRequiredProperty(name));
+    public double getDouble(String key) throws ConfigNotFoundException {
+        return DOUBLE_VALUE_CONVERTER.convert(key, getRequiredProperty(key));
     }
 
     @Override
-    public double getDouble(String name, double defaultValue) {
-        return DOUBLE_VALUE_CONVERTER.convert(name, getProperty(name), defaultValue);
+    public double getDouble(String key, double defaultValue) {
+        return DOUBLE_VALUE_CONVERTER.convert(key, getProperty(key), defaultValue);
     }
 
     @Override
-    public String getString(String name) {
-        return getString(name, null);
+    public String getString(String key) {
+        return getString(key, null);
     }
 
     @Override
-    public String getString(String name, String defaultValue) {
-        String v = getProperty(name);
+    public String getString(String key, String defaultValue) {
+        String v = getProperty(key);
         if (v == null) {
             v = defaultValue;
         }
@@ -101,39 +103,39 @@ public class DefaultConfigProvider implements ConfigProvider {
     }
 
     @Override
-    public BigDecimal getBigDecimal(String name) {
-        return getBigDecimal(name, null);
+    public BigDecimal getBigDecimal(String key) {
+        return getBigDecimal(key, null);
     }
 
     @Override
-    public BigDecimal getBigDecimal(String name, String defaultValue) {
+    public BigDecimal getBigDecimal(String key, String defaultValue) {
         try {
-            String value = getString(name, defaultValue);
+            String value = getString(key, defaultValue);
             if (value == null) {
                 return null;
             }
 
             return new BigDecimal(value);
         } catch (Exception e) {
-            throw new WrongConfigValueException(name, defaultValue, e);
+            throw new WrongConfigValueException(key, defaultValue, e);
         }
     }
 
     @Override
-    public BigInteger getBigInteger(String name) throws ConfigNotFoundException {
-        return getBigInteger(name, null);
+    public BigInteger getBigInteger(String key) throws ConfigNotFoundException {
+        return getBigInteger(key, null);
     }
 
     @Override
-    public BigInteger getBigInteger(String name, String defaultValue) {
+    public BigInteger getBigInteger(String key, String defaultValue) {
         try {
-            String value = getString(name, defaultValue);
+            String value = getString(key, defaultValue);
             if (value == null) {
                 return null;
             }
             return new BigInteger(value);
         } catch (Exception e) {
-            throw new WrongConfigValueException(name, defaultValue, e);
+            throw new WrongConfigValueException(key, defaultValue, e);
         }
     }
 
@@ -146,27 +148,27 @@ public class DefaultConfigProvider implements ConfigProvider {
     }
 
     /**
-     * @param name
+     * @param key
      * @return
      */
-    protected String getRequiredProperty(String name) throws ConfigNotFoundException {
-        String v = getProperty(name);
+    protected String getRequiredProperty(String key) throws ConfigNotFoundException {
+        String v = getProperty(key);
         if (v == null) {
-            throw new ConfigNotFoundException(name);
+            throw new ConfigNotFoundException(key);
         }
         return PLACEHOLDER_HELPER.replacePlaceholders(v, getProperties());
     }
 
     /**
-     * @param name
+     * @param key
      * @return
      */
-    protected String getProperty(String name) {
-        if (name == null || name.isEmpty()) {
+    protected String getProperty(String key) {
+        if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException("属性名称 [propertyName] 不能为 null 或者空字符");
         }
 
-        String v = getProperties().getProperty(name);
+        String v = getProperties().getProperty(key);
         if (v == null) {
             return v;
         }

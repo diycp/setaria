@@ -1,6 +1,8 @@
 package com.weghst.setaria.client;
 
 /**
+ * 配置数据结构类型.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 public class ConfigBean {

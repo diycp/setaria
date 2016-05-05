@@ -1,7 +1,6 @@
 package com.weghst.setaria.console.web.controller;
 
 import java.io.IOException;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +29,8 @@ import com.weghst.setaria.core.service.AppService;
 import com.weghst.setaria.core.service.ConfigService;
 
 /**
+ * 配置控制器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @Controller

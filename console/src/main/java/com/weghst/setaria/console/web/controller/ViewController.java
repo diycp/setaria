@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
+ * 视图控制器.
+ *
  * @author Kevin Zou (kevinz@weghst.com)
  */
 @Controller

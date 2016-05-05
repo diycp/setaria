@@ -3,7 +3,7 @@
 <head>
     <base href="${rc.contextPath}/">
     <meta charset="UTF-8">
-    <title>Setaria 统一配置 - 登录</title>
+    <title>Setaria 分布式统一配置管理 - 登录</title>
     <link rel="stylesheet" href="amaze-ui/css/amazeui.min.css"/>
 
     <script src="js/jquery.min.js"></script>
