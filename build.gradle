@@ -20,8 +20,6 @@ allprojects {
         mavenCentral()
     }
 
-    group = 'com.weghst.setaria'
-
     apply plugin: 'propdeps'
     apply plugin: 'propdeps-maven'
     apply plugin: 'propdeps-idea'
