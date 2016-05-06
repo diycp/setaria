@@ -21,7 +21,6 @@ allprojects {
     }
 
     group = 'com.weghst.setaria'
-    version = '1.0-SNAPSHOT'
 
     apply plugin: 'propdeps'
     apply plugin: 'propdeps-maven'
