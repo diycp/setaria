@@ -45,7 +45,7 @@ allprojects {
         git {
             requireBranch = 'master'
             pushToRemote = 'origin'
-            pushToBranchPrefix = 'setaria-'
+            pushToBranchPrefix = ''
         }
     }
 }
@@ -64,10 +64,6 @@ subprojects {
     configurations {
         compile.exclude group: 'commons-logging', module: 'commons-logging'
     }
-//
-//    signing {
-//        sign configurations.archives
-//    }
 
     modifyPom {
         project {
