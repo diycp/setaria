@@ -37,6 +37,13 @@ allprojects {
     ext.slf4jVersion = '1.7.12'
     ext.testngVersion = '6.9.6'
     ext.springVersion = '4.2.3.RELEASE'
+
+    release {
+        buildTasks = ['build']
+        scmAdapters = [
+                net.researchgate.release.GitAdapter
+        ]
+    }
 }
 
 subprojects {
