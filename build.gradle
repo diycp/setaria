@@ -39,9 +39,16 @@ allprojects {
 
     release {
         buildTasks = ['build']
+
         scmAdapters = [
                 net.researchgate.release.GitAdapter
         ]
+
+        git {
+            requireBranch = 'master'
+            pushToRemote = 'origin'
+            pushToBranchPrefix = 'setaria-'
+        }
     }
 }
 
