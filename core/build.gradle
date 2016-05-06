@@ -1,5 +1,12 @@
 project(':core') {
 
+    modifyPom {
+        project {
+            name 'Setaria Server Core Project'
+            description 'Setaria 分布式统一配置服务端核心功能程序'
+        }
+    }
+
     dependencies {
         compile 'commons-codec:commons-codec:1.10'
         compile 'org.apache.commons:commons-lang3:3.4'

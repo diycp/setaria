@@ -8,6 +8,8 @@ buildscript {
 
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        classpath 'net.researchgate:gradle-release:2.3.4'
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
 }
 
@@ -21,13 +23,16 @@ allprojects {
     group = 'com.weghst.setaria'
     version = '1.0-SNAPSHOT'
 
-    apply plugin: 'java'
     apply plugin: 'propdeps'
     apply plugin: 'propdeps-maven'
     apply plugin: 'propdeps-idea'
-
-    apply plugin: 'maven'
     apply plugin: 'idea'
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    apply plugin: 'net.researchgate.release'
 
     ext.slf4jVersion = '1.7.12'
     ext.testngVersion = '6.9.6'
@@ -35,6 +40,10 @@ allprojects {
 }
 
 subprojects {
+
+    apply plugin: 'com.bmuschko.nexus'
+
+    archivesBaseName = "$rootProject.name-$project.name"
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -44,9 +53,49 @@ subprojects {
     configurations {
         compile.exclude group: 'commons-logging', module: 'commons-logging'
     }
+//
+//    signing {
+//        sign configurations.archives
+//    }
 
-    jar {
-        baseName = "$rootProject.name-$project.name"
+    modifyPom {
+        project {
+            url 'https://github.com/weghst/setaria'
+            inceptionYear '2016'
+
+            scm {
+                connection 'scm:git:https://github.com/weghst/setaria.git'
+                developerConnection 'scm:git:git@github.com:weghst/setaria.git'
+                url 'https://github.com/weghst/setaria'
+            }
+
+            licenses {
+                license {
+                    name 'The Apache License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'kevin'
+                    name 'Kevin Zou'
+                    email 'kevinz@weghst.com'
+                }
+            }
+        }
+    }
+
+    extraArchive {
+        sources = true
+        tests = false
+        javadoc = true
+    }
+
+    nexus {
+        sign = true
+        repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 
     dependencies {

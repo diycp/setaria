@@ -2,6 +2,13 @@ project(':console') {
 
     apply plugin: 'war'
 
+    modifyPom {
+        project {
+            name 'Setaria Server Console Project'
+            description 'Setaria 分布式统一配置服务端 WEB 控制台管理应用平台'
+        }
+    }
+
     dependencies {
         provided 'javax.servlet:javax.servlet-api:3.1.0'
         compile project(':core')
