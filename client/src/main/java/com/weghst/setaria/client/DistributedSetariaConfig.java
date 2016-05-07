@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.weghst.setaria.client;
 
 import java.io.IOException;
@@ -69,6 +84,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
     private String env;
     private String urlNodePath;
     private String appNodePath;
+    private String clientNodePath;
 
     public DistributedSetariaConfig(Map<String, String> configParameters) {
         super(configParameters);
@@ -183,8 +199,14 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         }
 
         try {
-            zooKeeper.create(ZkPathUtils.join(appNodePath, CLIENT_NODE_PREFIX), bytes, ZooDefs.Ids.READ_ACL_UNSAFE,
-                    CreateMode.EPHEMERAL_SEQUENTIAL);
+            if (clientNodePath == null) {
+                clientNodePath = zooKeeper.create(ZkPathUtils.join(appNodePath, CLIENT_NODE_PREFIX), bytes,
+                        ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+            } else {
+                Stat stat = new Stat();
+                zooKeeper.getData(clientNodePath, false, stat);
+                zooKeeper.setData(clientNodePath, bytes, stat.getVersion());
+            }
         } catch (Exception e) {
             LOG.error("向 ZooKeeper 提交客户端信息错误 ->> {}", clientInfo, e);
             throw new SetariaConfigException(e);

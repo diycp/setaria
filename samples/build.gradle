@@ -1,0 +1,30 @@
+project(':samples') {
+
+    apply plugin: 'war'
+    apply plugin: 'com.bmuschko.tomcat'
+
+    modifyPom {
+        project {
+            name 'Setaria Samples Project'
+            description 'Setaria 样例程序'
+        }
+    }
+
+    tomcat {
+        httpPort = 8081
+        ajpPort = 8010
+        contextPath = '/'
+    }
+
+    dependencies {
+        providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+        compile project(':client')
+        compile "org.springframework:spring-webmvc:$springVersion"
+        compile "org.logback-extensions:logback-ext-spring:0.1.4"
+
+        def tomcatVersion = '7.0.59'
+        tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+                "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+                "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+    }
+}

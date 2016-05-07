@@ -10,6 +10,8 @@ buildscript {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
         classpath 'net.researchgate:gradle-release:2.3.4'
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.12.1"
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.4'
     }
 }
 
@@ -20,7 +22,7 @@ allprojects {
         mavenCentral()
     }
 
-    group = com.weghst.setaria
+    group = 'com.weghst.setaria'
 
     apply plugin: 'propdeps'
     apply plugin: 'propdeps-maven'
@@ -32,6 +34,7 @@ allprojects {
     apply plugin: 'signing'
 
     apply plugin: 'net.researchgate.release'
+    apply plugin: "com.github.hierynomus.license"
 
     ext.slf4jVersion = '1.7.12'
     ext.testngVersion = '6.9.6'
@@ -49,6 +52,20 @@ allprojects {
             pushToRemote = 'origin'
             pushToBranchPrefix = ''
         }
+    }
+
+    license {
+        header = rootProject.file('license-header.txt')
+        // skipExistingHeaders = true
+        ignoreFailures = true
+        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.name = 'The Weghst Inc.'
+        ext.email = 'kevinz@weghst.com'
+
+        excludes([
+                'gradlew*', '**/gradle.properties', '**/gradle-wrapper.properties', '*.adoc',
+                '**/amaze-ui/**', '**/css/**', '**/js/**'
+        ])
     }
 }
 

@@ -17,7 +17,7 @@ project(':client') {
         // 分布式配置依赖
         compile 'com.squareup.okhttp:okhttp:2.7.5'
         compile 'com.fasterxml.jackson.core:jackson-databind:2.6.5'
-        compile('org.apache.zookeeper:zookeeper:3.4.8') {
+        compile('org.apache.zookeeper:zookeeper:3.4.6') {
             exclude group: 'org.slf4j', module: 'slf4j-log4j12'
             exclude group: 'log4j', module: 'log4j'
             exclude group: 'jline', module: 'jline'

@@ -1,2 +1,84 @@
-# setaria
-setaria分布式配置管理
+= Setaria 分布式统一配置管理
+
+Setaria 采用集中式配置管理, 运维/开发人员可以通过 Setaria Console 对配置进行维护, 同时 Setaria 提供用户权限管理, 可以非常简单的将配置应用归属于不同的用户进行维护.
+
+Setaria 使用 ZooKeeper 作为分布式协调器, 并提供一套完整的服务端管理程序与客户端 API.
+
+== Setaria Console 部署(服务端)
+
+=== 获取代码
+----
+git clone https://github.com/weghst/setaria.git
+----
+
+=== 创建数据库 console/src/main/resources/db/schema-mariadb.sql
+[source,sql]
+----
+CREATE DATABASE `setaria` CHARACTER SET utf8 COLLATE utf8_bin ;
+USE `setaria` ;
+-- create user --
+CREATE USER 'setaria'@'%' IDENTIFIED BY '';
+FLUSH PRIVILEGES ;
+GRANT ALL PRIVILEGES ON setaria.* TO 'setaria'@'%' WITH GRANT OPTION;
+----
+
+=== Setaria Console 应用参数 console/src/main/resources/setaria.properties
+----
+# 系统超级管理员用户名, 该用户无法通过应用删除与修改邮箱
+setaria.root = root@weghst.com
+
+# JDBC 数据源
+druid.url = jdbc:mysql://localhost:3306/setaria
+druid.username = setaria
+druid.password =
+druid.initialSize = 2
+druid.minIdle = 2
+druid.maxActive = 100
+druid.maxWait = 60000
+druid.timeBetweenEvictionRunsMillis = 60000
+druid.minEvictableIdleTimeMillis = 300000
+druid.validationQuery = SELECT 'x'
+druid.poolPreparedStatements = true
+druid.maxPoolPreparedStatementPerConnectionSize = 8
+
+# ZooKeeper 配置
+# ZooKeeper 连接字符串
+setaria.zookeeper.servers = 127.0.0.1:2181
+
+# Setaria 在 ZooKeeper 保存配置信息的根路径
+setaria.zookeeper.basePath = /setaria
+
+# 获取配置的 URL 路径前缀
+# 实际客户端获取配置路径样例: http://localhost:8080/p/configs/pull/:appName/:appEnv
+setaria.pull.config.url = http://localhost:8080/p/configs/pull
+----
+
+IMPORTANT: 应用启动之前请先将 MySQL 数据库连接信息与 ZooKeeper连接信息按自己的环境进行配置
+
+=== 启用服务
+[source,shell]
+----
+$ cd $SETARIA_HOME
+$ ./gradlew :console:tomcatRun
+----
+
+== Setaria Client (客户端)
+
+.Maven
+[source,xml]
+----
+<dependency>
+  <groupId>com.weghst.setaria</groupId>
+  <artifactId>setaria-client</artifactId>
+  <version>1.0.0</version>
+</dependency>
+----
+
+.Gradle
+[source,groovy]
+----
+compile 'com.weghst.setaria:setaria-client:1.0.0'
+----
+
+'''
+https://github.com/weghst/setaria/tree/master/samples[客户端示例应用] - samples
