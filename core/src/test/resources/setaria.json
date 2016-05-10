@@ -1,0 +1,12 @@
+{
+  "setariaConfigImpl": "",
+  "resources": [
+    {
+      "location": "classpath:setaria.json"
+    },
+    {
+      "location": "~/setaria/setaria.json",
+      "ignoreResourceNotFound": true
+    }
+  ]
+}

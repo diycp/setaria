@@ -83,6 +83,7 @@
         <mvc:interceptor>
             <!--<mvc:mapping path="/*"/>-->
             <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/v2/**"/>
             <mvc:exclude-mapping path="/**/login*"/>
             <mvc:exclude-mapping path="/configs/pull/**"/>
             <bean class="com.weghst.setaria.console.web.LoginValidatingInterceptor"/>
