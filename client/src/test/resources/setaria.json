@@ -1,0 +1,12 @@
+{
+  "setaria.config.implementation.class": "com.weghst.setaria.client.JsonSetariaConfig",
+  "setaria.config.resources": [
+    {
+      "location": "classpath:test-config.json"
+    },
+    {
+      "location": "~/setaria/test-config.json",
+      "ignoreNotFound": true
+    }
+  ]
+}
