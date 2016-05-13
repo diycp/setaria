@@ -6,8 +6,12 @@
 
     <link rel="stylesheet" href="${rc.contextPath}/vendor/foundation-6.2.1/css/foundation.min.css"/>
     <link rel="stylesheet" href="${rc.contextPath}/vendor/font-awesome-4.6.2/css/font-awesome.min.css"/>
+    <<<<<<< HEAD
     <link rel="stylesheet" href="${rc.contextPath}/css/dashboard.css"/>
     <link rel="stylesheet" href="${rc.contextPath}/css/theme.css"/>
+    =======
+    <link rel="stylesheet" href="${rc.contextPath}/css/custom.css"/>
+    >>>>>>> origin/master
 
     <script src="${rc.contextPath}/vendor/jquery-2.2.3.min.js"></script>
     <script src="${rc.contextPath}/vendor/angular-1.5.5/angular.min.js"></script>
@@ -24,13 +28,21 @@
                 .config(function ($controllerProvider, $stateProvider, $urlRouterProvider) {
                     app.controllerProvider = $controllerProvider;
 //                    $urlRouterProvider.otherwise('/');
-                    $stateProvider.state('/', {
+                    $stateProvider.state('default', {
                                 url: '/',
-                                templateUrl: 'summary.ftl'
+                                templateUrl: 'default.ftl'
                             })
                             .state('login', {
                                 url: '/login',
                                 templateUrl: 'login.ftl'
+                            })
+                            .state('appList', {
+                                url: '/apps',
+                                views: {
+                                    "": {
+                                        templateUrl: 'app/app-list.ftl'
+                                    }
+                                }
                             });
                 });
     </script>
