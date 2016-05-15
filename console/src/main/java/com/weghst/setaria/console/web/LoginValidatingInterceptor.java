@@ -31,11 +31,11 @@ public class LoginValidatingInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        HttpSession session = request.getSession();
-        if (session.getAttribute(Constants.SESSION_USER_ATTR_NAME) == null) {
-            response.sendRedirect(request.getContextPath() + "/p/login.v");
-            return false;
-        }
+//        HttpSession session = request.getSession();
+//        if (session.getAttribute(Constants.SESSION_USER_ATTR_NAME) == null) {
+//            response.sendRedirect(request.getContextPath() + "/p/login.v");
+//            return false;
+//        }
 
         return true;
     }

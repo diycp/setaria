@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,27 +17,19 @@ package com.weghst.setaria.client.spring;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.PropertySources;
-import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.ReflectionUtils;
 
-import com.weghst.setaria.client.Configs;
 import com.weghst.setaria.client.SetariaConfig;
 import com.weghst.setaria.client.SetariaConfigContext;
 import com.weghst.setaria.client.SetariaConfigListener;
@@ -51,19 +43,15 @@ import com.weghst.setaria.client.annotation.ConfigValue;
 class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered,
         ApplicationListener<ApplicationContextEvent> {
 
-    private final SimpleTypeConverter typeConverter = new SimpleTypeConverter();
-    private final PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(
-            new ConfigPropertySources());
-
     private SetariaConfigListener setariaConfigListener = new RefreshedSetariaConfigListener();
-    private ListableBeanFactory beanFactory;
+    private ConfigurableListableBeanFactory beanFactory;
 
     /**
      * 通过 {@link ListableBeanFactory} 创建处理器实例.
      *
-     * @param beanFactory {@link ListableBeanFactory}
+     * @param beanFactory {@link ConfigurableListableBeanFactory}
      */
-    public ConfigValueBeanPostProcessor(ListableBeanFactory beanFactory) {
+    ConfigValueBeanPostProcessor(ConfigurableListableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 
@@ -98,8 +86,8 @@ class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered
                     throw new IllegalStateException("@ConfigValue 注解只能用于 1 个参数的方法");
                 }
 
-                String str = propertyResolver.resolvePlaceholders(configValue.value());
-                Object newValue = typeConverter.convertIfNecessary(str, method.getParameterTypes()[0]);
+                String str = beanFactory.resolveEmbeddedValue(configValue.value());
+                Object newValue = beanFactory.getTypeConverter().convertIfNecessary(str, method.getParameterTypes()[0]);
                 ReflectionUtils.invokeMethod(method, bean, newValue);
             }
         });
@@ -112,8 +100,8 @@ class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered
                     return;
                 }
 
-                String str = propertyResolver.resolvePlaceholders(configValue.value());
-                Object newValue = typeConverter.convertIfNecessary(str, field.getType());
+                String str = beanFactory.resolveEmbeddedValue(configValue.value());
+                Object newValue = beanFactory.getTypeConverter().convertIfNecessary(str, field.getType());
 
                 ReflectionUtils.makeAccessible(field);
                 ReflectionUtils.setField(field, bean, newValue);
@@ -145,36 +133,6 @@ class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered
                     doPostProcessInitialization(beanFactory.getBean(beanName));
                 }
             }
-        }
-    }
-
-    private class ConfigPropertySources implements PropertySources {
-
-        PropertySource<?> configPropertySource = new PropertySource<Object>(Configs.class.getName()) {
-
-            @Override
-            public Object getProperty(String name) {
-                return Configs.getString(name);
-            }
-        };
-        List<?> propertySourceList = Arrays.asList(configPropertySource);
-
-        @Override
-        public boolean contains(String name) {
-            return configPropertySource.getName().equals(name);
-        }
-
-        @Override
-        public PropertySource<?> get(String name) {
-            if (configPropertySource.getName().equals(name)) {
-                return configPropertySource;
-            }
-            return null;
-        }
-
-        @Override
-        public Iterator<PropertySource<?>> iterator() {
-            return (Iterator<PropertySource<?>>) propertySourceList.iterator();
         }
     }
 }

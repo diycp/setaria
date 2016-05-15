@@ -1,0 +1,17 @@
+[
+  {
+    "key": "key.first",
+    "value": "第一个配置",
+    "description": "这是第一个配置"
+  },
+  {
+    "key": "key.second",
+    "value": "第二个配置",
+    "description": "这是第二个配置"
+  },
+  {
+    "key": "key.third",
+    "value": "第三个配置 -- ${key.first}",
+    "description": "这是第三个配置, 并引用 'key.first' 配置的属性值"
+  }
+]

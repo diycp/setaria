@@ -1,0 +1,7 @@
+[
+  {
+    "key": "key.first",
+    "value": "第一个配置 > test-config-2",
+    "description": "这是第一个配置, 如果属性名称相同则会覆盖旧的值"
+  }
+]

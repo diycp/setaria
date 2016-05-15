@@ -10,31 +10,37 @@
         <param-value>com.weghst.setaria.client.DistributedSetariaConfig</param-value>
     </context-param>
     <context-param>
-        <description>ZooKeeper 连接字符串</description>
-        <param-name>setaria.config.zookeeper.connectString</param-name>
-        <param-value>127.0.0.1:2181</param-value>
+        <description>[可选配置] Setaria 配置参数配置文件, 默认寻找 classpath:setaria.json 文件</description>
+        <param-name>setaria.config.location</param-name>
+        <param-value>classpath:setaria.json</param-value>
     </context-param>
-    <context-param>
-        <description>[可选配置] ZooKeeper Session 超时时间(毫秒), 默认60秒</description>
-        <param-name>setaria.config.zookeeper.sessionTimeout</param-name>
-        <param-value>60000</param-value>
-    </context-param>
-    <context-param>
-        <description><![CDATA[Setaria 在 ZooKeeper 管理配置的根目录, 需要和服务器的
-$setaria.zookeeper.basePath$ 配置一样, 默认值(/setaria)]]></description>
-        <param-name>setaria.config.zookeeper.basePath</param-name>
-        <param-value>/setaria</param-value>
-    </context-param>
-    <context-param>
-        <description>Setaria 所管理的应用名称</description>
-        <param-name>setaria.config.app</param-name>
-        <param-value>setaria.samples</param-value>
-    </context-param>
-    <context-param>
-        <description>Setaria 所管理的应用对应的环境</description>
-        <param-name>setaria.config.env</param-name>
-        <param-value>test</param-value>
-    </context-param>
+
+    <!--<context-param>-->
+    <!--<description>ZooKeeper 连接字符串</description>-->
+    <!--<param-name>setaria.config.zookeeper.connectString</param-name>-->
+    <!--<param-value>127.0.0.1:2181</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+    <!--<description>[可选配置] ZooKeeper Session 超时时间(毫秒), 默认60秒</description>-->
+    <!--<param-name>setaria.config.zookeeper.sessionTimeout</param-name>-->
+    <!--<param-value>60000</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+    <!--<description><![CDATA[Setaria 在 ZooKeeper 管理配置的根目录, 需要和服务器的-->
+    <!--$setaria.zookeeper.basePath$ 配置一样, 默认值(/setaria)]]></description>-->
+    <!--<param-name>setaria.config.zookeeper.basePath</param-name>-->
+    <!--<param-value>/setaria</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+    <!--<description>Setaria 所管理的应用名称</description>-->
+    <!--<param-name>setaria.config.app</param-name>-->
+    <!--<param-value>setaria.samples</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+    <!--<description>Setaria 所管理的应用对应的环境</description>-->
+    <!--<param-name>setaria.config.env</param-name>-->
+    <!--<param-value>test</param-value>-->
+    <!--</context-param>-->
 
     <listener>
         <listener-class>com.weghst.setaria.client.web.SetariaConfigContextListener</listener-class>

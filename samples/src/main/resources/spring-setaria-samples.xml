@@ -30,6 +30,7 @@
         必须配置 ConfigValueBeanFactoryPostProcessor 才会处理 @ConfigValue 注解
      -->
     <bean class="com.weghst.setaria.client.spring.ConfigValueBeanFactoryPostProcessor"/>
+    <bean id="springXmlHelloBean" class="com.weghst.setaria.samples.SpringXmlHelloBean"/>
 
     <mvc:annotation-driven/>
 

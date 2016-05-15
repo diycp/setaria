@@ -13,15 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weghst.setaria.client.converter;
+package com.weghst.setaria.samples;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Kevin Zou (kevinz@weghst.com)
  */
-public class DoubleValueConverter extends AbstractValueConverter<Double> {
+@Component
+public class SpringHelloBean {
 
-    @Override
-    protected Double doConvert(String value) {
-        return Double.parseDouble(value);
+    @Value("${samples.first}")
+    private String first;
+    @Value("${samples.second}")
+    private int second;
+
+    public String getFirst() {
+        return first;
+    }
+
+    public void setFirst(String first) {
+        this.first = first;
+    }
+
+    public int getSecond() {
+        return second;
+    }
+
+    public void setSecond(int second) {
+        this.second = second;
     }
 }

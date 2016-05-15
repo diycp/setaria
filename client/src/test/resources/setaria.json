@@ -1,5 +1,4 @@
 {
-  "setaria.config.implementation.class": "com.weghst.setaria.client.JsonSetariaConfig",
   "setaria.config.resources": [
     {
       "location": "classpath:test-config.json"
@@ -8,5 +7,10 @@
       "location": "~/setaria/test-config.json",
       "ignoreNotFound": true
     }
-  ]
+  ],
+  "setaria.config.zookeeper.connectString": "localhost:2181",
+  "setaria.config.zookeeper.sessionTimeout": 3000,
+  "setaria.config.zookeeper.basePath": "/setaria",
+  "setaria.config.zookeeper.app": "pine",
+  "setaria.config.zookeeper.env": "test"
 }

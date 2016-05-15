@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,13 +18,13 @@ package com.weghst.setaria.client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -56,58 +56,40 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
     private static final String APP_PARENT_SEGMENT = "/apps";
     private static final String CLIENT_NODE_PREFIX = "/client-";
 
-    /**
-     * ZooKeeper 连接字符串.
-     */
-    public static final String CONFIG_ZOOKEEPER_CONNECT_STRING = "setaria.config.zookeeper.connectString";
-    /**
-     * ZooKeeper 会话超时时间(ms), 默认为 60s.
-     */
-    public static final String CONFIG_ZOOKEEPER_SESSION_TIMEOUT = "setaria.config.zookeeper.sessionTimeout";
-    /**
-     * ZooKeeper 中配置根目录, 默认为 /setaria.
-     */
-    public static final String CONFIG_BASE_PATH = "setaria.config.zookeeper.basePath";
-    /**
-     * 配置应用名称.
-     */
-    public static final String CONFIG_APP = "setaria.config.app";
-    /**
-     * 配置应用环境.
-     */
-    public static final String CONFIG_ENV = "setaria.config.env";
-
     private ZooKeeper zooKeeper;
     private ConfigProvider configProvider;
 
-    private String app;
-    private String env;
+    private SetariaBean setariaBean;
+
     private String urlNodePath;
     private String appNodePath;
     private String clientNodePath;
 
-    public DistributedSetariaConfig(Map<String, String> configParameters) {
-        super(configParameters);
+    public DistributedSetariaConfig(SetariaBean setariaBean) {
+        Assert.notNull(setariaBean);
+        this.setariaBean = setariaBean;
 
-        String connectString = getConfigParameter(CONFIG_ZOOKEEPER_CONNECT_STRING);
-        String basePath = configParameters.get(CONFIG_BASE_PATH);
+        Assert.hasLength(setariaBean.getZkConnectString());
+        Assert.hasLength(setariaBean.getZkApp());
+        Assert.hasLength(setariaBean.getZkEnv());
+
+        String basePath = setariaBean.getZkBasePath();
         if (basePath == null || basePath.isEmpty()) {
             basePath = DEFAULT_BASE_PATH;
         }
-        app = getConfigParameter(CONFIG_APP);
-        env = getConfigParameter(CONFIG_ENV);
 
-        appNodePath = ZkPathUtils.join(basePath, APP_PARENT_SEGMENT, app + "-" + env);
+        appNodePath = ZkPathUtils.join(basePath, APP_PARENT_SEGMENT, setariaBean.getZkApp() + "-"
+                + setariaBean.getZkEnv());
         urlNodePath = ZkPathUtils.join(basePath, URL_SEGMENT);
-        LOG.debug("分布式配置参数 connectString: {}, path: {}", connectString, appNodePath);
+        LOG.debug("分布式配置参数 connectString: {}, path: {}", setariaBean.getZkConnectString(), appNodePath);
 
         int sessionTimeout = DEFAULT_SESSION_TIMEOUT;
-        if (configParameters.containsKey(CONFIG_ZOOKEEPER_SESSION_TIMEOUT)) {
-            sessionTimeout = Integer.parseInt(configParameters.get(CONFIG_ZOOKEEPER_SESSION_TIMEOUT));
+        if (setariaBean.getZkSessionTimeout() > 0) {
+            sessionTimeout = setariaBean.getZkSessionTimeout();
         }
 
         try {
-            zooKeeper = new ZooKeeper(connectString, sessionTimeout, new Watcher() {
+            zooKeeper = new ZooKeeper(setariaBean.getZkConnectString(), sessionTimeout, new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
                     if (appNodePath.equals(event.getPath()) && event.getType() == Event.EventType.NodeDataChanged) {
@@ -116,7 +98,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
                 }
             });
         } catch (IOException e) {
-            LOG.error("连接 ZooKeeper 服务器错误 ->> {}", connectString, e);
+            LOG.error("连接 ZooKeeper 服务器错误 ->> {}", setariaBean.getZkConnectString(), e);
             throw new SetariaConfigException(e);
         }
     }
@@ -145,7 +127,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
             try {
                 zooKeeper.close();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("{}", e);
             }
         }
     }
@@ -217,7 +199,8 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         String url = getUrl();
         LOG.debug("读取 [{}] 配置", url);
 
-        HttpUrl httpUrl = HttpUrl.parse(url).newBuilder().addPathSegment(app).addPathSegment(env).build();
+        HttpUrl httpUrl = HttpUrl.parse(url).newBuilder().addPathSegment(setariaBean.getZkApp())
+                .addPathSegment(setariaBean.getZkEnv()).build();
         Request request = new Request.Builder().url(httpUrl).get().build();
         ConfigBean[] configBeans;
         try {

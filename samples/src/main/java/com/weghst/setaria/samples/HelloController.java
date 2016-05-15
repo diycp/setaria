@@ -28,10 +28,16 @@ public class HelloController {
 
     @Autowired
     private HelloBean helloBean;
+    @Autowired
+    private SpringHelloBean springHelloBean;
+    @Autowired
+    private SpringXmlHelloBean springXmlHelloBean;
 
     @RequestMapping("/hello")
     public String hello(Model model) {
         model.addAttribute("hello", helloBean);
+        model.addAttribute("springHello", springHelloBean);
+        model.addAttribute("springXmlHello", springXmlHelloBean);
         return "/hello";
     }
 }

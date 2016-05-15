@@ -1,0 +1,7 @@
+{
+  "setaria.config.zookeeper.connectString": "127.0.0.1:2181",
+  "setaria.config.zookeeper.sessionTimeout": 60000,
+  "setaria.config.zookeeper.basePath": "/setaria",
+  "setaria.config.zookeeper.app": "setaria.samples",
+  "setaria.config.zookeeper.env": "test"
+}
