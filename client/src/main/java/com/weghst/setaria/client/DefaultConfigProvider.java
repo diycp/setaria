@@ -17,6 +17,7 @@ package com.weghst.setaria.client;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -28,9 +29,7 @@ import com.weghst.setaria.client.converter.*;
  *
  * @author Kevin Zou (kevinz@weghst.com)
  */
-class DefaultConfigProvider implements ConfigProvider {
-
-    private final static PropertyPlaceholderHelper PLACEHOLDER_HELPER = new PropertyPlaceholderHelper("${", "}");
+public class DefaultConfigProvider implements ConfigProvider {
 
     private final static BooleanValueConverter BOOLEAN_VALUE_CONVERTER = new BooleanValueConverter();
     private final static IntValueConverter INT_VALUE_CONVERTER = new IntValueConverter();
@@ -41,11 +40,23 @@ class DefaultConfigProvider implements ConfigProvider {
     //
     private final Properties properties;
 
+    /**
+     * @param properties
+     */
     public DefaultConfigProvider(Properties properties) {
         if (properties == null) {
             throw new IllegalArgumentException("properties 不能为null");
         }
-        this.properties = new Properties(properties);
+
+        PropertyPlaceholderHelper placeholderHelper = new PropertyPlaceholderHelper("${", "}");
+        Properties replacedProperties = new Properties();
+        for (Map.Entry<?, ?> entry : properties.entrySet()) {
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            replacedProperties.setProperty(key, placeholderHelper.replacePlaceholders(value, properties));
+        }
+
+        this.properties = replacedProperties;
     }
 
     @Override
@@ -171,7 +182,7 @@ class DefaultConfigProvider implements ConfigProvider {
         if (v == null) {
             throw new ConfigNotFoundException(key);
         }
-        return PLACEHOLDER_HELPER.replacePlaceholders(v, getProperties());
+        return properties.getProperty(key);
     }
 
     /**
@@ -187,6 +198,6 @@ class DefaultConfigProvider implements ConfigProvider {
         if (v == null) {
             return v;
         }
-        return PLACEHOLDER_HELPER.replacePlaceholders(v, getProperties());
+        return properties.getProperty(key);
     }
 }
