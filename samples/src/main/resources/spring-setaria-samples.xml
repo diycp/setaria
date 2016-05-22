@@ -27,9 +27,10 @@
     <context:component-scan base-package="com.weghst.setaria"/>
 
     <!--
-        必须配置 ConfigValueBeanFactoryPostProcessor 才会处理 @ConfigValue 注解
+        必须配置 ConfigValueBeanFactoryPostProcessor 才可使用 @ConfigValue @Value 以及 Spring Xml 获取 Setaria 的配置属性值
      -->
     <bean class="com.weghst.setaria.client.spring.ConfigValueBeanFactoryPostProcessor"/>
+
     <bean id="springXmlHelloBean" class="com.weghst.setaria.samples.SpringXmlHelloBean">
         <property name="first" value="${samples.first}"/>
         <property name="second" value="${samples.second}"/>

@@ -1,68 +1,8 @@
-= Setaria 分布式统一配置管理
+= Setaria 配置管理
 
-Setaria 采用集中式配置管理, 运维/开发人员可以通过 Setaria Console 对配置进行维护, 同时 Setaria 提供用户权限管理, 可以非常简单的将配置应用归属于不同的用户进行维护.
+Setaria 一套简单的配置管理 API, 可支持文件, 分布式配置实现, 同时支持配置热加载.
 
-Setaria 使用 ZooKeeper 作为分布式协调器, 并提供一套完整的服务端管理程序与客户端 API.
-
-== Setaria Console 部署(服务端)
-
-=== 获取代码
-----
-git clone https://github.com/weghst/setaria.git
-----
-
-=== 创建数据库 console/src/main/resources/db/schema-mariadb.sql
-[source,sql]
-----
-CREATE DATABASE `setaria` CHARACTER SET utf8 COLLATE utf8_bin ;
-USE `setaria` ;
--- create user --
-CREATE USER 'setaria'@'%' IDENTIFIED BY '';
-FLUSH PRIVILEGES ;
-GRANT ALL PRIVILEGES ON setaria.* TO 'setaria'@'%' WITH GRANT OPTION;
-----
-
-=== Setaria Console 应用参数 console/src/main/resources/setaria.properties
-----
-# 系统超级管理员用户名, 该用户无法通过应用删除与修改邮箱
-setaria.root = root@weghst.com
-
-# JDBC 数据源
-druid.url = jdbc:mysql://localhost:3306/setaria
-druid.username = setaria
-druid.password =
-druid.initialSize = 2
-druid.minIdle = 2
-druid.maxActive = 100
-druid.maxWait = 60000
-druid.timeBetweenEvictionRunsMillis = 60000
-druid.minEvictableIdleTimeMillis = 300000
-druid.validationQuery = SELECT 'x'
-druid.poolPreparedStatements = true
-druid.maxPoolPreparedStatementPerConnectionSize = 8
-
-# ZooKeeper 配置
-# ZooKeeper 连接字符串
-setaria.zookeeper.servers = 127.0.0.1:2181
-
-# Setaria 在 ZooKeeper 保存配置信息的根路径
-setaria.zookeeper.basePath = /setaria
-
-# 获取配置的 URL 路径前缀
-# 实际客户端获取配置路径样例: http://localhost:8080/p/configs/pull/:appName/:appEnv
-setaria.pull.config.url = http://localhost:8080/p/configs/pull
-----
-
-IMPORTANT: 应用启动之前请先将 MySQL 数据库连接信息与 ZooKeeper连接信息按自己的环境进行配置
-
-=== 启用服务
-[source,shell]
-----
-$ cd $SETARIA_HOME
-$ ./gradlew :console:tomcatRun
-----
-
-== Setaria Client (客户端)
+== Setaria Client 使用
 
 .Maven
 [source,xml]
@@ -70,15 +10,115 @@ $ ./gradlew :console:tomcatRun
 <dependency>
   <groupId>com.weghst.setaria</groupId>
   <artifactId>setaria-client</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ----
 
 .Gradle
 [source,groovy]
 ----
-compile 'com.weghst.setaria:setaria-client:1.0.0'
+compile 'com.weghst.setaria:setaria-client:1.1.0'
 ----
 
-'''
-https://github.com/weghst/setaria/tree/master/samples[客户端示例应用] - samples
+=== 普通 Java 程序中使用 Setaria
+
+[source,java]
+----
+SetariaBean setariaBean = new SetariaBean();
+setariaBean.addResource("classpath:test-fileSetariaConfig.properties");
+setariaBean.addResource("classpath:test-fileSetariaConfig.properties", false);
+
+SetariaConfig setariaConfig = new PropertiesSetariaConfig(setariaBean);
+setariaConfig.init();
+
+SetariaConfigContext.setSetariaConfig(setariaConfig);
+----
+
+`SetariaBean` 是 Setaria 参数配置 Bean. `SetariaBean` 支持多文件配置, 同时支持忽略不存在的配置文件, Setaria 会监听配置文件的变化, 如果你在应用运行时修改了配置 Setaria 会自动重载配置.
+
+=== Java Web 程序中使用 Setaria
+https://github.com/weghst/setaria/tree/master/samples[Java Web Samples 程序]
+
+[source,xml]
+----
+<context-param>
+  <description>Setaria 配置实现类</description>
+  <param-name>setaria.config.implementation</param-name>
+  <param-value>com.weghst.setaria.client.DistributedSetariaConfig</param-value>
+</context-param>
+<context-param>
+  <description>[可选配置] Setaria 配置参数配置文件, 默认寻找 classpath:setaria.json 文件</description>
+  <param-name>setaria.config.location</param-name>
+  <param-value>classpath:setaria.json</param-value>
+</context-param>
+
+<listener>
+  <listener-class>com.weghst.setaria.client.web.SetariaConfigContextListener</listener-class>
+</listener>
+----
+
+==== setaria.json
+`SetariaConfigContextListener` 默认会寻找 `setaria.json` 配置文件来获取 Setaria 初始化所需要的参数.
+
+[source,json]
+----
+{
+  "setaria.config.resources": [
+    {
+      "location": "classpath:test-config.json"
+    },
+    {
+      "location": "~/setaria/test-config.json",
+      "ignoreNotFound": true
+    }
+  ],
+
+  "setaria.config.zookeeper.connectString": "localhost:2181",
+  "setaria.config.zookeeper.sessionTimeout": 3000,
+  "setaria.config.zookeeper.basePath": "/setaria",
+  "setaria.config.zookeeper.app": "pine",
+  "setaria.config.zookeeper.env": "test"
+}
+----
+
+NOTE: `setaria.config.resources` 是文件配置参数, `setaria.config.zookeeper.*` 是分布式配置参数, 根据当前的配置模式选择参数.
+
+=== Setaria Java API
+通过原生的 Java API 获取配置属性值, `com.weghst.setaria.client.Configs` 是 Setaria 提供获取配置属性值的 Java 原生 API.
+
+=== Setaria Spring 使用
+配置 Setaria 的 `BeanFactoryPostProcessor`.
+
+[source,xml]
+----
+<!--
+    必须配置 ConfigValueBeanFactoryPostProcessor 才可使用 @ConfigValue @Value 以及 Spring Xml 获取 Setaria 的配置属性值
+ -->
+<bean class="com.weghst.setaria.client.spring.ConfigValueBeanFactoryPostProcessor"/>
+----
+
+`@com.weghst.setaria.client.annotation.ConfigValue` 由 Setaria 提供的配置属性获取注解, 使用该注解获取配置属性值, 当配置属性值发生变化时 Setaria 会自动更新所对应的 Bean 对象, 同时该注解也支持 Spring 表达式.
+
+[source,java]
+----
+@ConfigValue("${samples.first:Default Value}")
+private String first;
+----
+
+`@org.springframework.beans.factory.annotation.Value` 通过 Spring 原生的配置注解获取配置属性值, `@Value` 与 `@ConfigValue` 唯一的区别是 `@Value` Setaria 不会在运行时*自动更新*配置属性值.
+
+[source,java]
+----
+@Value("${samples.first:Default Value}")
+private String first;
+----
+
+Spring Xml 获取配置属性值. 通过 Spring Xml 注入的配置属性值不会在运行时*自动更新*其值.
+
+[source,xml]
+----
+<bean id="springXmlHelloBean" class="com.weghst.setaria.samples.SpringXmlHelloBean">
+  <property name="first" value="${samples.first}"/>
+  <property name="second" value="${samples.second}"/>
+</bean>
+----

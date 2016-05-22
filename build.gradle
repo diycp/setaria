@@ -64,7 +64,7 @@ allprojects {
 
         excludes([
                 'gradlew*', '**/gradle.properties', '**/gradle-wrapper.properties', '*.adoc',
-                '**/amaze-ui/**', '**/css/**', '**/js/**'
+                '*.json', '**/asserts/**', '**/js/**'
         ])
     }
 }

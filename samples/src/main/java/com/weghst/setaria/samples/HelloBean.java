@@ -25,7 +25,7 @@ import com.weghst.setaria.client.annotation.ConfigValue;
 @Component
 public class HelloBean {
 
-    @ConfigValue("${samples.first}")
+    @ConfigValue("${samples.first:Default Value}")
     private String first;
     @ConfigValue("${samples.second}")
     private int second;

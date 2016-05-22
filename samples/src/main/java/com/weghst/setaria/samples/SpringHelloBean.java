@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringHelloBean {
 
-    @Value("${samples.first}")
+    @Value("${samples.first:Default Value}")
     private String first;
     @Value("${samples.second}")
     private int second;
