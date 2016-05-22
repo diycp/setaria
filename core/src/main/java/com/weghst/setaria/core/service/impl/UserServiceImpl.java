@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
             dbUser.setPassword(DigestUtils.md5Hex(user.getPassword()));
         }
 
-        dbUser.setManager(user.isManager());
+        dbUser.setType(user.getType());
         userRepository.update(dbUser);
 
         // 更新APP
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findOrdinaryUsers() {
-        return userRepository.findUserByManager(false);
+        return userRepository.findUserByManager(User.TYPE_SIMPLE);
     }
 
     @Transactional(readOnly = true)

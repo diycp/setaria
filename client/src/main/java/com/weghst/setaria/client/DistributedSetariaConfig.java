@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
- * <p/>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.OkHttpClient;
@@ -154,7 +155,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
     private void refresh0() {
         Stat stat = new Stat();
         try {
-            byte[] bytes = zooKeeper.getData(appNodePath, true, stat);
+            zooKeeper.getData(appNodePath, true, stat);
             loadConfigs();
         } catch (Exception e) {
             throw new SetariaConfigException(e);
@@ -206,7 +207,16 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         try {
             OkHttpClient httpClient = new OkHttpClient();
             Response response = httpClient.newCall(request).execute();
-            configBeans = OBJECT_MAPPER.readValue(response.body().byteStream(), ConfigBean[].class);
+
+            JsonNode root = OBJECT_MAPPER.readTree(response.body().byteStream());
+            int code = root.get("code").asInt();
+            if (code >= 300) {
+                LOG.error("获取配置错误 <<-- {}", root.asText());
+                throw new SetariaConfigException("获取配置错误 code:" + code + ", reasonPhrase: "
+                        + root.get("reasonPhrase").asText());
+            }
+
+            configBeans = OBJECT_MAPPER.treeToValue(root.get("data"), ConfigBean[].class);
         } catch (IOException e) {
             throw new SetariaConfigException("加载 [" + url + "] 配置失败", e);
         }
@@ -215,7 +225,7 @@ public class DistributedSetariaConfig extends AbstractSetariaConfig {
         Properties properties = new Properties();
         for (ConfigBean configBean : configBeans) {
             properties.setProperty(configBean.getKey(), configBean.getValue());
-            LOG.debug("配置项 ->> [{}: {}]", configBean.getKey(), configBean.getValue());
+            LOG.debug("配置项 -->> [{}: {}]", configBean.getKey(), configBean.getValue());
         }
 
         //

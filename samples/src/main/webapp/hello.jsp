@@ -19,9 +19,9 @@
 
 <h1>通过 Spring @Value 注解自动注入配置属性 (通过 @Value 注入配置不会自动刷新配置值)</h1>
 <ul>
-    <li>Fist: <span style="color: red;">${hello.first}</span>
+    <li>Fist: <span style="color: red;">${springHello.first}</span>
     </li>
-    <li>Second: <span style="color: red;">${hello.second}</span>
+    <li>Second: <span style="color: red;">${springHello.second}</span>
     </li>
 </ul>
 
@@ -29,9 +29,9 @@
 
 <h1>通过 Spring XML 自动注入配置属性 (通过 XML 注入的配置不会自动刷新配置值)</h1>
 <ul>
-    <li>Fist: <span style="color: red;">${hello.first}</span>
+    <li>Fist: <span style="color: red;">${springXmlHello.first}</span>
     </li>
-    <li>Second: <span style="color: red;">${hello.second}</span>
+    <li>Second: <span style="color: red;">${springXmlHello.second}</span>
     </li>
 </ul>
 </body>

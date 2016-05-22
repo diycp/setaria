@@ -22,7 +22,7 @@ package com.weghst.setaria.console.web;
  */
 public enum ErrorCodes {
 
-    UNKNOWN(-1, "未知错误"),
+    UNKNOWN(999, "未知错误"),
     E_10001(10001, "用户不存在"),
     E_10002(10002, "密码错误"),
     // configs pull 错误码

@@ -1,0 +1,123 @@
+<script>
+    app.controller('AppListCtrl', function ($scope, $templateCache, $compile, $http, $state, $filter) {
+        $('#appList').DataTable({
+            ajax: {
+                url: 'r/apps/myapps',
+            },
+            columns: [
+                {
+                    data: function (data) {
+                        var tmpl = '<a ng-click="showClientInfos(%s)">%s</a>';
+                        return sprintf(tmpl, data.id, data.id);
+                    }
+                },
+                {
+                    data: function (data) {
+                        var tmpl = '<a ui-sref="config-list({appId:%s,appName:\'%s\',appEnv:\'%s\'})">%s</a>';
+                        return sprintf(tmpl, data.id, data.name, data.env, data.name);
+                    }
+                },
+                {
+                    data: function (data) {
+                        var tmpl = '<label class="label %s" style="text-transform: none;">%s</label>';
+                        var labelClass = 'label-success';
+                        if (data.env === 'developer') {
+                            labelClass = 'label-default';
+                        } else if (data.env === 'test') {
+                            labelClass = 'label-warning';
+                        }
+                        return sprintf(tmpl, labelClass, data.env);
+                    }
+                },
+                {data: 'description'},
+                {
+                    searchable: false,
+                    data: function (data, type, row, meta) {
+                        if (data.lastUpdatedTime == 0) {
+                            return "";
+                        } else {
+                            return $filter('date')(data.lastUpdatedTime, 'yyyy-MM-dd HH:mm:ss');
+                        }
+                    }
+                },
+                {
+                    searchable: false,
+                    orderable: false,
+                    width: 68,
+                    type: 'html',
+                    data: function (data, type, row, meta) {
+                        var tmpl = $templateCache.get('/table_basic_actions.html');
+                        var editTmpl = sprintf('ui-sref="app-edit({id:%s})"', data.id);
+                        var deleteTmpl = sprintf('ng-click="deleteApp(%s)"', data.id);
+                        return sprintf(tmpl, editTmpl, deleteTmpl);
+                    }
+                }
+            ],
+            initComplete: function () {
+                $compile($(this))($scope);
+            }
+        });
+
+        $('.dataTables_length select').select2({
+            minimumResultsForSearch: Infinity,
+            width: 'auto'
+        });
+
+        // Highlighting rows and columns on mouseover
+        dataTableHighlightColumns();
+
+        // 删除应用
+        $scope.deleteApp = function (id) {
+            var param = {
+                title: '确认删除应用',
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#EF5350",
+                confirmButtonText: '确认',
+                cancelButtonText: '取消'
+            };
+            swal(param, function (isConfirm) {
+                if (isConfirm) {
+                    $http.delete('r/apps/' + id).success(function () {
+                        $state.go($state.current, {}, {reload: true});
+                    });
+                }
+            });
+        }
+
+        $scope.showClientInfos = function (id) {
+            $http.get('r/apps/' + id + "/clientInfos").success(function (result) {
+                $scope.clientInfos = result.data;
+
+                $http.get('pages/app-client-infos.html').success(function (tmpl) {
+                    winModal.html(tmpl);
+
+                    console.dir($scope.clientInfos);
+                    $compile(winModal)($scope);
+                    winModal.open();
+                });
+            });
+        }
+    })
+    ;
+</script>
+<div class="panel panel-flat" ng-controller="AppListCtrl">
+    <div class="panel-heading">
+        <h5 class="panel-title">应用列表</h5>
+    </div>
+
+    <div class="panel-body">
+    </div>
+    <table id="appList" class="table table-bordered table-hover datatable-highlight">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>环境</th>
+            <th>描述</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>

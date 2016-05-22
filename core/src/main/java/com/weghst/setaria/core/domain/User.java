@@ -27,6 +27,15 @@ public class User implements Serializable {
     private static final long serialVersionUID = -5331182262867932385L;
 
     /**
+     * 普通用户.
+     */
+    public static final String TYPE_SIMPLE = "simple";
+    /**
+     * 管理员用户.
+     */
+    public static final String TYPE_MANAGER = "manager";
+
+    /**
      * 主键.
      */
     private int id;
@@ -45,7 +54,7 @@ public class User implements Serializable {
     /**
      * 用户是否为管理员.
      */
-    private boolean manager;
+    private String type;
 
     public int getId() {
         return id;
@@ -79,12 +88,12 @@ public class User implements Serializable {
         this.createdTime = createdTime;
     }
 
-    public boolean isManager() {
-        return manager;
+    public String getType() {
+        return type;
     }
 
-    public void setManager(boolean manager) {
-        this.manager = manager;
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -94,7 +103,7 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", createdTime=" + createdTime +
-                ", manager=" + manager +
+                ", type='" + type + '\'' +
                 '}';
     }
 }

@@ -17,11 +17,9 @@ package com.weghst.setaria.console.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Spring 异常处理器.
@@ -35,12 +33,11 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Object exceptionHandler(Exception e) {
-        LOG.error("", e);
+        LOG.error("{}", e);
 
-        ErrorResult result = new ErrorResult(ErrorCodes.UNKNOWN);
-        result.setErrorMessage(e.getMessage());
+        Result result = new Result(ErrorCodes.UNKNOWN);
+        result.setReasonPhrase(e.getMessage());
         return result;
     }
 

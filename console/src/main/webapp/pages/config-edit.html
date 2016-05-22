@@ -1,0 +1,58 @@
+<script>
+    app.controller('ConfigEditCtrl', function ($scope, $http, $state, $stateParams) {
+        var restUrl = 'r/configs/' + $stateParams.configId;
+        $http.get(restUrl).success(function (result) {
+            $scope.config = result.data;
+        });
+
+        $scope.editConfig = function () {
+            $http.put(restUrl, $scope.config).success(function (result) {
+                if (result.code < 300) {
+                    winModal.close();
+                    $state.go($state.current, {}, {reload: true});
+                } else {
+                    new PNotify({
+                        text: result.reasonPhrase,
+                        addclass: 'bg-danger'
+                    });
+                }
+            });
+        }
+    });
+
+    winModal.on('shown.bs.modal', function () {
+        $('#key').focus();
+    });
+</script>
+<div class="modal-dialog" ng-controller="ConfigEditCtrl">
+    <div class="modal-content">
+        <div class="modal-header bg-primary">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h5 class="modal-title">修改配置</h5>
+        </div>
+
+        <form ng-submit="editConfig()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>键 {{hello}}</label>
+                    <input id="key" type="text" ng-model="config.key" placeholder="配置键" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>值</label>
+                    <textarea id="value" ng-model="config.value" placeholder="配置值" class="form-control"
+                              required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="description" ng-model="config.description" placeholder="配置描述" class="form-control"
+                              required></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">提 交<i
+                        class="icon-arrow-right14 position-right"></i></button>
+            </div>
+        </form>
+    </div>
+</div>

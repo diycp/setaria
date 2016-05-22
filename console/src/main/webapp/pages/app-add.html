@@ -1,0 +1,74 @@
+<script>
+    app.controller('AppAddCtrl', function ($scope, $http, $state) {
+        $scope.addApp = function () {
+            $http.post('r/apps', $scope.app).success(function (data) {
+                if (data.code == 0) {
+                    $state.go('app-list');
+                } else {
+                    new PNotify({
+                        title: '添加应用',
+                        text: data.reasonPhrase,
+                        addclass: 'bg-danger'
+                    });
+                }
+            });
+        }
+
+        $http.get('r/users/ordinaries').success(function (data) {
+            $.map(data, function (obj) {
+                obj.text = obj.email;
+                return obj;
+            });
+
+            $('#userIds').select2({data: data});
+        });
+    });
+
+    $(function () {
+        $('#env').select2({minimumResultsForSearch: Infinity});
+    });
+</script>
+
+<div class="panel panel-flat" ng-controller="AppAddCtrl">
+    <div class="panel-heading">
+        <h5 class="panel-title">添加应用</h5>
+    </div>
+
+    <div class="panel-body">
+        <div class="col-md-6">
+            <form ng-submit="addApp()">
+                <div class="form-group">
+                    <label for="name">名称</label>
+                    <input type="text" id="name" ng-model="app.name" class="form-control"
+                           placeholder="应用名称 4 至 32 字字符, 且只能为字母数字下划线及点"
+                           required pattern="^([a-z]|[A-Z]|[0-9]|[_\.]){4,30}$"/>
+                </div>
+                <div class="form-group">
+                    <label for="env">环境</label>
+                    <select id="env" ng-model="app.env" data-placeholder="应用环境">
+                        <option></option>
+                        <option value="developer">developer</option>
+                        <option value="test">test</option>
+                        <option value="production">production</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">描述</label>
+                    <textarea id="description" ng-model="app.description" maxlength="256"
+                              class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>应用所属用户</label>
+
+                    <select id="userIds" ng-model="app.userIds" multiple="multiple" data-placeholder="请选择应用所属用户">
+                    </select>
+                </div>
+
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">提 交<i
+                            class="icon-arrow-right14 position-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

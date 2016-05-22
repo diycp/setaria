@@ -14,4 +14,4 @@
 -- limitations under the License.
 --
 
-INSERT INTO t_user(email,password,manager,createdTime) VALUES('root@weghst.com', md5('root'), 1, unix_timestamp() * 1000);
+INSERT INTO t_user(email,password,type,createdTime) VALUES('root@weghst.com', md5('root'), 'manager', unix_timestamp() * 1000);

@@ -72,10 +72,10 @@ public interface UserRepository {
     /**
      * 根据用户类型查询用户信息列表.
      *
-     * @param manager 是否为管理员
+     * @param type 是否为管理员
      * @return 用户信息列表
      */
-    List<User> findUserByManager(boolean manager);
+    List<User> findUserByManager(String type);
 
     /**
      * 查询所有用户信息.

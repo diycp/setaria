@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
@@ -31,12 +32,11 @@ public class LoginValidatingInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-//        HttpSession session = request.getSession();
-//        if (session.getAttribute(Constants.SESSION_USER_ATTR_NAME) == null) {
-//            response.sendRedirect(request.getContextPath() + "/p/login.v");
-//            return false;
-//        }
-
+        HttpSession session = request.getSession();
+        if (session.getAttribute(Constants.SESSION_USER_ATTR_NAME) == null) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            return false;
+        }
         return true;
     }
 }

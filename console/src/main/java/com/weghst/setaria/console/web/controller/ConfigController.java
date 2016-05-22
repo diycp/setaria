@@ -24,15 +24,13 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.weghst.setaria.console.web.Constants;
 import com.weghst.setaria.console.web.ErrorCodes;
-import com.weghst.setaria.console.web.ErrorResult;
 import com.weghst.setaria.console.web.Result;
 import com.weghst.setaria.core.ObjectMapperUtils;
 import com.weghst.setaria.core.domain.App;
@@ -61,18 +59,28 @@ public class ConfigController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Object save(@RequestBody Config config, HttpSession session) {
-        User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
-        configService.save(config, user.getEmail());
-        return Result.SUCCESS;
+        try {
+            User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
+            configService.save(config, user.getEmail());
+            return Result.SUCCESS;
+        } catch (DuplicateKeyException e) {
+            Result result = new Result(2000, "重复的键 [" + config.getKey() + "]");
+            return result;
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Object update(@PathVariable int id, @RequestBody Config config, HttpSession session) {
-        User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
-        config.setId(id);
-        configService.update(config, user.getEmail());
-        return Result.SUCCESS;
+        try {
+            User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
+            config.setId(id);
+            configService.update(config, user.getEmail());
+            return Result.SUCCESS;
+        } catch (DuplicateKeyException e) {
+            Result result = new Result(2000, "重复的键 [" + config.getKey() + "]");
+            return result;
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -85,8 +93,14 @@ public class ConfigController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public Object get(@PathVariable int id) {
-        return configService.findById(id);
+    public Result get(@PathVariable int id) {
+        return new Result(configService.findById(id));
+    }
+
+    @RequestMapping(value = "/app/{appId}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object findByAppId(@PathVariable int appId) {
+        return configService.findByAppId(appId);
     }
 
     /**
@@ -95,26 +109,27 @@ public class ConfigController {
      * @return
      */
     @RequestMapping(value = "/pull/{appName}/{appEnv}", method = RequestMethod.GET)
-    public @ResponseBody Object pull(@PathVariable String appName, @PathVariable String appEnv) {
+    @ResponseBody
+    public Result pull(@PathVariable String appName, @PathVariable String appEnv) {
         Env env;
         try {
             env = Env.valueOf(appEnv);
         } catch (IllegalArgumentException e) {
-            ErrorResult result = new ErrorResult(ErrorCodes.E_20001);
-            result.setErrorMessage("错误的应用环境 [" + appEnv + "], 环境可选值为 " + Arrays.toString(Env.values()));
-            return ResponseEntity.badRequest().body(result);
+            Result result = new Result(ErrorCodes.E_20001);
+            result.setReasonPhrase("错误的应用环境 [" + appEnv + "], 环境可选值为 " + Arrays.toString(Env.values()));
+            return result;
         }
 
         try {
-            return configService.findByAppNameAndEnv(appName, env);
+            return new Result(configService.findByAppNameAndEnv(appName, env));
         } catch (AppNotFoundException e) {
-            ErrorResult result = new ErrorResult(ErrorCodes.E_20002);
-            result.setErrorMessage(e.getMessage());
-            return ResponseEntity.badRequest().body(result);
+            Result result = new Result(ErrorCodes.E_20002);
+            result.setReasonPhrase(e.getMessage());
+            return result;
         }
     }
 
-    @RequestMapping(value = "import/{appId}")
+    @RequestMapping(value = "/import/{appId}")
     @ResponseBody
     public Object importConfig(@PathVariable int appId, @RequestParam("file") MultipartFile multipartFile,
                                HttpSession session) {
@@ -128,14 +143,14 @@ public class ConfigController {
             configService.saveOrUpdate(configs, user.getEmail());
             return Result.SUCCESS;
         } catch (Exception e) {
-            ErrorResult errorResult = new ErrorResult();
-            errorResult.setErrorCode(ErrorCodes.UNKNOWN.getCode());
-            errorResult.setErrorMessage("上传文件失败 ->> " + e.getMessage());
+            Result errorResult = new Result();
+            errorResult.setCode(ErrorCodes.UNKNOWN.getCode());
+            errorResult.setReasonPhrase("上传文件失败 ->> " + e.getMessage());
             return errorResult;
         }
     }
 
-    @RequestMapping(value = "export/{appId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/export/{appId}", method = RequestMethod.GET)
     public void exportConfig(@PathVariable int appId, HttpServletResponse response) throws IOException {
         List<Config> list = configService.findByAppId(appId);
         List<ConfigDto> configDtos = new ArrayList<>(list.size());
@@ -154,32 +169,5 @@ public class ConfigController {
         response.setContentLength(bytes.length);
 
         response.getOutputStream().write(bytes);
-    }
-
-    @RequestMapping("/add.v")
-    public ModelAndView addView() {
-        ModelAndView mav = new ModelAndView("config-add");
-        return mav;
-    }
-
-    @RequestMapping("/edit.v")
-    public ModelAndView editView(int id) {
-        ModelAndView mav = new ModelAndView("config-edit");
-        return mav;
-    }
-
-    @RequestMapping("/details.v")
-    public ModelAndView detailsView(int id) {
-        ModelAndView mav = new ModelAndView("config-details");
-        mav.addObject("config", configService.findById(id));
-        return mav;
-    }
-
-    @RequestMapping("/list.v")
-    public ModelAndView listView(int appId) {
-        ModelAndView mav = new ModelAndView("config-list");
-        mav.addObject("app", appService.findById(appId));
-        mav.addObject("configs", configService.findByAppId(appId));
-        return mav;
     }
 }

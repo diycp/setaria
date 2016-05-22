@@ -1,0 +1,106 @@
+<script>
+    app.controller('UserEditCtrl', function ($scope, $http, $state, $stateParams) {
+        $scope.restUrl = 'r/users/' + $stateParams.id;
+
+        $http.get($scope.restUrl).success(function (data) {
+            $.extend($scope, data);
+
+            $http.get('r/apps').success(function (data2) {
+                var tmp = {};
+                $.map(data2, function (obj) {
+                    var parent = tmp[obj.env];
+                    if (!parent) {
+                        parent = tmp[obj.env] = {text: obj.env, children: []};
+                    }
+
+                    obj.text = obj.name;
+                    parent.children.push(obj);
+                });
+
+                var select2Data = [];
+                $.map(tmp, function (obj) {
+                    select2Data.push(obj);
+                });
+
+                $('#appIds').select2({
+                    data: select2Data
+                });
+
+                $('#appIds').select2().val($scope.appIds).trigger('change');
+            });
+        });
+
+        $scope.editUser = function () {
+            var user = {
+                email: $scope.email,
+                password: $scope.password,
+                type: $scope.type,
+                appIds: $('#appIds').val()
+            };
+
+            $http.put($scope.restUrl, user).success(function (data) {
+                if (data.code == 0) {
+                    $state.go('user-list');
+                } else {
+                    new PNotify({
+                        title: '修改用户',
+                        text: data.reasonPhrase,
+                        addclass: 'bg-danger'
+                    });
+                }
+            });
+        }
+    });
+
+    $(function () {
+        $('#appIds').select2({minimumResultsForSearch: Infinity});
+    });
+</script>
+
+<div class="panel panel-flat" ng-controller="UserEditCtrl">
+    <div class="panel-heading">
+        <h5 class="panel-title">修改用户</h5>
+    </div>
+
+    <div class="panel-body">
+        <div class="col-md-6">
+            <form ng-submit="editUser()">
+                <input type="hidden" ng-model="id">
+
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" ng-model="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" ng-model="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>用户类型</label>
+
+                    <div class="radio">
+                        <label>
+                            <input name="type" type="radio" ng-value="'manager'" ng-model="type"> 管理员
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input name="type" type="radio" ng-value="'simple'" ng-model="type"> 普通用户
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>应用</label>
+
+                    <select id="appIds" multiple="multiple" data-placeholder="选择用户管理的应用">
+                    </select>
+                </div>
+
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">提 交<i
+                            class="icon-arrow-right14 position-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -27,7 +27,7 @@ public class UserVo {
     private int id;
     private String email;
     private String password;
-    private boolean manager;
+    private String type;
     private int[] appIds;
 
     public int getId() {
@@ -54,13 +54,12 @@ public class UserVo {
         this.password = password;
     }
 
-    public boolean isManager() {
-        return manager;
+    public String getType() {
+        return type;
     }
 
-    public UserVo setManager(boolean manager) {
-        this.manager = manager;
-        return this;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int[] getAppIds() {
@@ -80,7 +79,7 @@ public class UserVo {
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", manager=" + manager +
+                ", type='" + type + '\'' +
                 ", appIds=" + Arrays.toString(appIds) +
                 '}';
     }

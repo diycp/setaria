@@ -19,7 +19,7 @@ CREATE TABLE `t_user` (
   `email` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '登录邮箱',
   `password` varchar(100) COLLATE utf8_bin NOT NULL COMMENT '登录密码',
   `createdTime` bigint(20) DEFAULT NULL COMMENT '创建时间',
-  `manager` int(11) DEFAULT '0' COMMENT '1: 管理员, 0: 普通用户',
+  `type` varchar(10) DEFAULT 'simple' COMMENT 'manager: 管理员, simple: 普通用户',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_user_email_uindex` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='用户表';

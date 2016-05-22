@@ -1,0 +1,144 @@
+<script>
+    app.controller('ConfigListCtrl', function ($scope, $templateCache, $compile, $http, $state, $stateParams, $filter) {
+        $scope.appId = $stateParams.appId;
+        $scope.appName = $stateParams.appName;
+        $scope.appEnv = $stateParams.appEnv;
+
+        var appEnvLabelClass = 'label-success';
+        if ($stateParams.appEnv === 'developer') {
+            appEnvLabelClass = 'label-default';
+        } else if ($stateParams.appEnv === 'test') {
+            appEnvLabelClass = 'label-warning';
+        }
+        $scope.appEnvLabelClass = appEnvLabelClass;
+
+        $('#configList').DataTable({
+            ajax: {
+                url: 'r/configs/app/' + $stateParams.appId,
+                dataSrc: ''
+            },
+            columns: [
+                {data: 'id'},
+                {data: 'key'},
+                {data: 'value'},
+                {data: 'description'},
+                {
+                    searchable: false,
+                    data: function (data, type, row, meta) {
+                        if (data.lastUpdatedTime == 0) {
+                            return "";
+                        } else {
+                            return $filter('date')(data.lastUpdatedTime, 'yyyy-MM-dd HH:mm:ss');
+                        }
+                    }
+                },
+                {
+                    searchable: false,
+                    orderable: false,
+                    width: 68,
+                    type: 'html',
+                    data: function (data, type, row, meta) {
+                        var tmpl = $templateCache.get('/table_basic_actions.html');
+                        var editTmpl = sprintf('ng-click="editConfig(%s)"', data.id);
+                        var deleteTmpl = sprintf('ng-click="deleteConfig(%s)"', data.id);
+                        return sprintf(tmpl, editTmpl, deleteTmpl);
+                    }
+                }
+            ],
+            initComplete: function () {
+                $compile($(this))($scope);
+            }
+        });
+
+        $('.dataTables_length select').select2({
+            minimumResultsForSearch: Infinity,
+            width: 'auto'
+        });
+
+        // Highlighting rows and columns on mouseover
+        dataTableHighlightColumns();
+
+        $scope.addConfig = function () {
+            $http.get('pages/config-add.html').success(function (tmpl) {
+                winModal.html(tmpl);
+                $compile(winModal)($scope);
+                winModal.open();
+            });
+        }
+
+        $scope.editConfig = function (id) {
+            $http.get('pages/config-edit.html').success(function (tmpl) {
+                $stateParams.configId = id;
+
+                winModal.html(tmpl);
+                $compile(winModal)($scope);
+                winModal.open();
+            });
+        }
+
+        // 删除应用
+        $scope.deleteConfig = function (id) {
+            var param = {
+                title: '确认删除配置',
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#EF5350",
+                confirmButtonText: '确认',
+                cancelButtonText: '取消'
+            };
+            swal(param, function (isConfirm) {
+                if (isConfirm) {
+                    $http.delete('r/configs/' + id).success(function () {
+                        $state.go($state.current, {}, {reload: true});
+                    });
+                }
+            });
+        }
+
+        $scope.importConfig = function () {
+            $http.get('pages/config-import.html').success(function (tmpl) {
+                winModal.html(tmpl);
+                $compile(winModal)($scope);
+                winModal.open();
+            });
+        }
+
+        $scope.exportConfig = function () {
+            $http.get('r/configs/' + $stateParams.appId).success(function (result) {
+                console.dir(result);
+            });
+        }
+    })
+    ;
+</script>
+<div class="panel panel-flat" ng-controller="ConfigListCtrl">
+    <div class="panel-heading">
+        <h5 class="panel-title">配置列表
+            <label class="label label-primary" style="text-transform: none;">{{appName}}</label>
+            <label class="label {{appEnvLabelClass}}" style="text-transform: none">{{appEnv}}</label>
+
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a ng-click="addConfig()" class="btn btn-default">添加</a>
+                    <a ng-click="importConfig()" class="btn btn-default">导入</a>
+                    <a href="r/configs/export/{{appId}}" target="_blank" class="btn btn-default">导出</a>
+                </div>
+            </div>
+        </h5>
+    </div>
+
+    <div class="panel-body">
+    </div>
+    <table id="configList" class="table table-bordered table-hover datatable-highlight">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>键</th>
+            <th>值</th>
+            <th>描述</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>

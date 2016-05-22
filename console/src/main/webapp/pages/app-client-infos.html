@@ -1,0 +1,29 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-primary">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h5 class="modal-title">客户端连接信息</h5>
+        </div>
+
+        <div class="modal-body">
+            <div class="table-responsive pre-scrollable">
+                <table class="table table-bordered table-framed">
+                    <thead>
+                    <tr>
+                        <th>主机</th>
+                        <th>配置更新时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="info in clientInfos">
+                        <td>{{info.host}}</td>
+                        <td>{{info.lastPullTime * 1000 | date: 'yyyy:MM:dd HH:mm:ss'}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
