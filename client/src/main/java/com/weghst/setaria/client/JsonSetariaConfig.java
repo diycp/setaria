@@ -28,7 +28,7 @@ import com.weghst.setaria.client.util.ObjectMapperUtils;
 /**
  * JSON 文件配置实现.
  *
- * @author Kevin Zou <kevinz@weghst.com>
+ * @author Kevin Zou (kevinz@weghst.com)
  */
 public class JsonSetariaConfig extends AbstractWatchedSetariaConfig {
 
