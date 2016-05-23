@@ -29,18 +29,17 @@
     <!-- /angular JS files -->
 
     <!-- Utils JS files -->
-    <script src="assets/js/plugins/extensions/jquery.storageapi.min.js"></script>
+    <script src="assets/js/plugins/extensions/store.min.js"></script>
     <!-- /utils JS files -->
 
     <script>
         var app = angular.module('App', []).controller('LoginCtrl', function ($scope, $http) {
-            var ns = $.initNamespaceStorage('setaria.console');
-            if (ns.localStorage.isSet('login.rememberMe')) {
-                $scope.rememberMe = ns.localStorage.get('login.rememberMe');
+            if (store.get('login.rememberMe')) {
+                $scope.rememberMe = store.get('login.rememberMe');
             }
 
             if ($scope.rememberMe) {
-                $scope.email = ns.localStorage.get('login.email');
+                $scope.email = store.get('login.email');
                 $('#password').focus();
             } else {
                 $('#email').focus();
@@ -48,16 +47,19 @@
 
             $scope.login = function () {
                 if ($scope.rememberMe) {
-                    ns.localStorage.set('login.email', $scope.email);
-                    ns.localStorage.set('login.rememberMe', $scope.rememberMe);
+                    store.set('login.email', $scope.email);
+                    store.set('login.rememberMe', $scope.rememberMe);
                 } else {
-                    ns.localStorage.remove('login.email');
-                    ns.localStorage.remove('login.rememberMe');
+                    store.remove('login.email');
+                    store.remove('login.rememberMe');
                 }
 
                 var user = {email: $scope.email, password: $scope.password};
                 $http.post('r/login', user).success(function (result) {
-                    ns.localStorage.set('signed_user', result.data);
+                    if (result.code >= 300) {
+                        alert(result.reasonPhrase);
+                        return;
+                    }
                     location.href = "index.html";
                 });
             }

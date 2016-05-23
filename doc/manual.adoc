@@ -1,0 +1,221 @@
+= Setaria 使用手册
+在一个项目中参数配置是非常基本也是非常重要的部分, 我们的项目都有各自的实现对配置的处理方式, Setaria 期望能统一配置实现标准. Setaria 支持不同格式的文件配置, 同时会监听文件在变化, 在应用运行时无需重启应用, Setaria 会自动重载配置至内存中. Setaria 也支持分布式配置管理并提供一套配置管理后台应用程序用于运维/开发人员方便的管理分布式配置, 在控制台程序中也可监控客户机的配置状态.
+
+== Client API 使用
+
+.Maven
+[source,xml]
+----
+<dependency>
+  <groupId>com.weghst.setaria</groupId>
+  <artifactId>setaria-client</artifactId>
+  <version>1.1.0</version>
+</dependency>
+----
+
+.Gradle
+[source,groovy]
+----
+compile 'com.weghst.setaria:setaria-client:1.1.0'
+----
+
+=== 纯编码的使用方式
+
+==== Properties 配置
+
+[source,java]
+----
+SetariaBean setariaBean = new SetariaBean();
+setariaBean.addResource("classpath:test-fileSetariaConfig.properties"); <1>
+setariaBean.addResource("classpath:test-fileSetariaConfig.xml", false); <2>
+
+SetariaConfig setariaConfig = new PropertiesSetariaConfig(setariaBean);
+setariaConfig.init(); <3>
+
+SetariaConfigContext.setSetariaConfig(setariaConfig); <4>
+
+setariaConfig.destroy(); <5>
+----
+<1> 指定 Properties 文件路径
+<2> 指定 Properties 文件路径, 当文件不存在时忽略该文件
+<3> 初始化 Setaria 配置
+<4> 将 SetariaConfig 保存至上下文中
+<5> 应用退出前销毁 Setaria 配置
+
+NOTE: PropertiesSetariaConfig 支持 .properties 与 .xml 的 Properties 文件加载
+
+==== JSON 配置
+
+[source,java]
+----
+SetariaBean setariaBean = new SetariaBean();
+setariaBean.addResource("classpath:test-fileSetariaConfig-1.json");
+setariaBean.addResource("classpath:test-fileSetariaConfig-2.json", false);
+
+SetariaConfig setariaConfig = new JsonSetariaConfig(setariaBean);
+setariaConfig.init();
+
+SetariaConfigContext.setSetariaConfig(setariaConfig);
+
+setariaConfig.destroy();
+----
+
+NOTE: JSON 配置与 Properties 配置参数一致, 只是使用 JsonSetariaConfig 来初始化配置, 同时在使用 Setaria 时也建议大家使用 JSON 的方式来配置自己项目中的参数, 因为 JSON 是一种能用的数据格式, 并且 Setaria Console 也同时支持 JSON 配置导入导出.
+
+==== ZooKeeper 分布式配置
+
+[source,java]
+----
+SetariaBean setariaBean = new SetariaBean();
+setariaBean.setZkBasePath("localhost:2181"); <1>
+setariaBean.setZkSessionTimeout(3000); <2>
+setariaBean.setZkBasePath("/setaria"); <3>
+setariaBean.setZkApp("setaria.samples"); <4>
+setariaBean.setZkEnv("test"); <5>
+
+SetariaConfig setariaConfig = new DistributedSetariaConfig(setariaBean);
+setariaConfig.init();
+
+SetariaConfigContext.setSetariaConfig(setariaConfig);
+
+setariaConfig.destroy();
+----
+<1> 必选: ZooKeeper 连接字符串
+<2> 可选: ZooKeeper 会话超时时间, 默认值 3000
+<3> 可选: Setaria 在 ZooKeeper 保存配置状态的根节点名称, 默认值 /setaria
+<4> 必选: 在 Setaria Console 管理的应用名称
+<5> 必选: 在 Setaria Console 管理的应用环境, 可选值(developer, test, production)
+
+NOTE: 要使用分布式配置之前必须先将 ZooKeeper 与 Setaria Console 安装配置完成, 请参考后面章节
+
+=== Web SetariaConfigContextListener 使用
+https://github.com/weghst/setaria/tree/master/samples[Java Web Samples 程序]
+
+[source,xml]
+----
+<context-param>
+  <param-name>setaria.config.implementation</param-name>
+  <param-value>com.weghst.setaria.client.DistributedSetariaConfig</param-value>
+</context-param>
+
+<listener>
+  <listener-class>com.weghst.setaria.client.web.SetariaConfigContextListener</listener-class>
+</listener>
+----
+
+在 Web 程序中配置 SetariaConfigContextListener 监听器, SetariaConfigContextListener 会以 `setaria.config.implementation` 配置的 SetariaConfig 实现类加载配置, 同时会自动寻找 `classpath:setaria.json` 文件加载其所需要的基础参数.
+
+[source,json]
+----
+{
+  "setaria.config.resources": [
+    {
+      "location": "classpath:test-config.json"
+    },
+    {
+      "location": "~/setaria/test-config.json",
+      "ignoreNotFound": true
+    }
+  ],
+
+  "setaria.config.zookeeper.connectString": "localhost:2181",
+  "setaria.config.zookeeper.sessionTimeout": 3000,
+  "setaria.config.zookeeper.basePath": "/setaria",
+  "setaria.config.zookeeper.app": "pine",
+  "setaria.config.zookeeper.env": "test"
+}
+----
+
+NOTE: `setaria.config.resources` 是文件配置参数, `setaria.config.zookeeper.*` 是分布式配置参数, 根据当前的配置模式选择参数.
+
+==== Java API 获取配置参数
+Setaria 提供一个 Java 工具类 `com.weghst.setaria.client.Configs` 能通过其 API 获取配置参数, 每次调用 API 获取配置都会返回最新的参数值.
+
+[source,java]
+----
+Configs.getBoolean(String key);
+Configs.getBoolean(String key, boolean defaultValue);
+
+Configs.getInt(String key);
+Configs.getInt(String key, int defaultValue);
+
+Configs.getLong(String key);
+Configs.getLong(String key, long defaultValue);
+
+Configs.getFloat(String key);
+Configs.getFloat(String key, float defaultValue);
+
+Configs.getDouble(String key);
+Configs.getDouble(String key, double defaultValue);
+
+Configs.getString(String key);
+Configs.getString(String key, String defaultValue);
+
+Configs.getBigDecimal(String key);
+Configs.getBigDecimal(String key, String defaultValue);
+
+Configs.getBigInteger(String key);
+Configs.getBigInteger(String key, String defaultValue);
+----
+
+==== Spring 获取配置参数
+通过 Spring 获取配置参数首先需要配置 `ConfigValueBeanFactoryPostProcessor`.
+
+[source,xml]
+----
+<!--
+    必须配置 ConfigValueBeanFactoryPostProcessor 才可使用 @ConfigValue @Value 以及 Spring Xml 获取 Setaria 的配置属性值
+ -->
+<bean class="com.weghst.setaria.client.spring.ConfigValueBeanFactoryPostProcessor"/>
+----
+
+`@com.weghst.setaria.client.annotation.ConfigValue` 由 Setaria 提供的配置属性获取注解, 使用该注解获取配置属性值, 当配置属性值发生变化时 Setaria 会自动更新所对应的 Bean 对象, 同时该注解也支持 Spring 表达式.
+
+[source,java]
+----
+@ConfigValue("${samples.first:Default Value}")
+private String first;
+----
+
+`@org.springframework.beans.factory.annotation.Value` 通过 Spring 原生的配置注解获取配置属性值, `@Value` 与 `@ConfigValue` 唯一的区别是 `@Value` Setaria 不会在运行时*自动更新*配置属性值.
+
+[source,java]
+----
+@Value("${samples.first:Default Value}")
+private String first;
+----
+
+Spring Xml 获取配置属性值. 通过 Spring Xml 注入的配置属性值不会在运行时*自动更新*其值.
+
+[source,xml]
+----
+<bean id="springXmlHelloBean" class="com.weghst.setaria.samples.SpringXmlHelloBean">
+  <property name="first" value="${samples.first}"/>
+  <property name="second" value="${samples.second}"/>
+</bean>
+----
+
+== Console 分布布配置管理
+Setaria 分布式配置采用 https://zookeeper.apache.org/[ZooKeeper] 作为调试器, 在配置 Console 服务之前请先将 ZooKeeper 安装完成.
+
+=== 服务搭建与启动
+. 获取源码包
+
+  $wget https://github.com/weghst/setaria/archive/1.1.0.zip
++
+NOTE: 如果你是在 Windows 环境中使用 Setaria Console 可直接https://github.com/weghst/setaria/archive/1.1.0.zip[下载]源码包通过解压工具解压文件内容直接跳至第 3 步.
+
+. 解压
+
+  $unzip 1.1.0.zip
+
+. 构建打包
+  
+  $cd setaria-1.1.0/
+  $./gradew build
+  $cd console/build/libs/
+  $unzip setaria-console-1.1.0.war -d setaria-console
++
+NOTE: 解压 war 的目的是为了配置 console 启动所需基本参数与按个人环境定制所需参数.
+
+. 创建数据库

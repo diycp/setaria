@@ -32,6 +32,8 @@ SetariaConfig setariaConfig = new PropertiesSetariaConfig(setariaBean);
 setariaConfig.init();
 
 SetariaConfigContext.setSetariaConfig(setariaConfig);
+
+setariaConfig.destroy();
 ----
 
 `SetariaBean` 是 Setaria 参数配置 Bean. `SetariaBean` 支持多文件配置, 同时支持忽略不存在的配置文件, Setaria 会监听配置文件的变化, 如果你在应用运行时修改了配置 Setaria 会自动重载配置.

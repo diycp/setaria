@@ -84,9 +84,7 @@ var app = angular.module('App', ['ui.router'])
         ;
 
         // controller register
-        app.controller = function (name, callback) {
-            $controllerProvider.register(name, callback);
-        }
+        app.controller = $controllerProvider.register;
 
         $httpProvider.interceptors.push(function ($q) {
             return {
@@ -113,7 +111,20 @@ var app = angular.module('App', ['ui.router'])
             };
         });
 
-    }).run(function ($rootScope, $stateParams) {
+    }).run(function ($rootScope, $stateParams, $http) {
+        $http.get('r/get-session-user').success(function (result) {
+            if (result >= 300 || !result.data) {
+                location.href = 'login.html';
+            }
+
+            var signedUser = result.data;
+            $('#signed_email').text(signedUser.email);
+
+            if (signedUser.type === 'simple') {
+                $('#navbar-second-toggle .user-manager').remove();
+            }
+        });
+
         $rootScope.$on('$stateChangeStart',
             function (event, toState, toParams, fromState, fromParams, options) {
                 $('#navbar-second-toggle li.active').removeClass('active');
@@ -129,16 +140,4 @@ $(function () {
             location.href = 'login.html';
         }
     });
-
-
-    var ns = $.initNamespaceStorage('setaria.console');
-    if (!ns.localStorage.isSet('signed_user')) {
-        //location.href = 'login.html';
-    }
-
-    var signedUser = ns.localStorage.get('signed_user');
-    $('#signed_email').text(signedUser.email);
-    if (signedUser.type === 'simple') {
-        $('#navbar-second-toggle .user-manager').remove();
-    }
 });

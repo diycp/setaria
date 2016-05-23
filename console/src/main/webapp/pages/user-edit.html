@@ -5,9 +5,9 @@
         $http.get($scope.restUrl).success(function (data) {
             $.extend($scope, data);
 
-            $http.get('r/apps').success(function (data2) {
+            $http.get('r/apps').success(function (result) {
                 var tmp = {};
-                $.map(data2, function (obj) {
+                $.map(result.data, function (obj) {
                     var parent = tmp[obj.env];
                     if (!parent) {
                         parent = tmp[obj.env] = {text: obj.env, children: []};

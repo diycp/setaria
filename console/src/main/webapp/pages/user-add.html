@@ -23,9 +23,9 @@
         }
 
 
-        $http.get('r/apps').success(function (data) {
+        $http.get('r/apps').success(function (result) {
             var tmp = {};
-            $.map(data, function (obj) {
+            $.map(result.data, function (obj) {
                 var parent = tmp[obj.env];
                 if (!parent) {
                     parent = tmp[obj.env] = {text: obj.env, children: []};
@@ -40,6 +40,7 @@
                 select2Data.push(obj);
             });
 
+            console.log(select2Data);
             $('#appIds').select2({
                 data: select2Data
             });

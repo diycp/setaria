@@ -77,8 +77,13 @@ public class AppController {
         return appVo;
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    public Object findAll() {
+        return new Result(appService.findAll());
+    }
+
     @RequestMapping(value = "/myapps", method = RequestMethod.GET)
-    public Object findAll(HttpSession session) {
+    public Object findMyApps(HttpSession session) {
         User user = (User) session.getAttribute(Constants.SESSION_USER_ATTR_NAME);
         List<App> myApps = appService.findAppsByUserIdOrRole(user.getId());
         return new Result(myApps);
