@@ -1,3 +1,8 @@
+:toc:
+:toc-title: 目录
+:imagesdir: images
+
+
 = Setaria 使用手册
 在一个项目中参数配置是非常基本也是非常重要的部分, 我们的项目都有各自的实现对配置的处理方式, Setaria 期望能统一配置实现标准. Setaria 支持不同格式的文件配置, 同时会监听文件在变化, 在应用运行时无需重启应用, Setaria 会自动重载配置至内存中. Setaria 也支持分布式配置管理并提供一套配置管理后台应用程序用于运维/开发人员方便的管理分布式配置, 在控制台程序中也可监控客户机的配置状态.
 
@@ -219,3 +224,123 @@ NOTE: 如果你是在 Windows 环境中使用 Setaria Console 可直接https://g
 NOTE: 解压 war 的目的是为了配置 console 启动所需基本参数与按个人环境定制所需参数.
 
 . 创建数据库
+
+  $vim setaria-console/WEB-INF/classes/db/schema-mariadb.sql
++
+[source,sql]
+----
+CREATE DATABASE `setaria` CHARACTER SET utf8 COLLATE utf8_bin ;
+USE `setaria` ;
+
+-- create user --
+CREATE USER 'setaria'@'%' IDENTIFIED BY '';
+
+FLUSH PRIVILEGES ;
+
+GRANT ALL PRIVILEGES ON setaria.* TO 'setaria'@'%' WITH GRANT OPTION;
+----
++
+NOTE: 通过 `schema-mariadb.sql` 文件中提供的建库及用户脚本创建数据库, 你可根据自己的需要创建也可, 后面只需要针对自己的环境配置.
+
+. 配置 Console 启动参数
+
+  $vim setaria-console/WEB-INF/classes/setaria.properties
++
+[source,properties]
+----
+# 系统超级管理员用户名, 该用户无法通过应用删除与修改邮箱
+setaria.root = root@weghst.com <1>
+
+# JDBC 数据源
+druid.url = jdbc:mysql://localhost:3306/setaria <2>
+druid.username = setaria <3>
+druid.password = <4>
+druid.initialSize = 1
+druid.minIdle = 1
+druid.maxActive = 100
+druid.maxWait = 60000
+druid.timeBetweenEvictionRunsMillis = 60000
+druid.minEvictableIdleTimeMillis = 300000
+druid.poolPreparedStatements = true
+druid.maxPoolPreparedStatementPerConnectionSize = 10
+
+# ZooKeeper 配置
+# ZooKeeper 连接字符串
+setaria.zookeeper.servers = 127.0.0.1:2181 <5>
+
+# Setaria 在 ZooKeeper 保存配置信息的根路径
+setaria.zookeeper.basePath = /setaria <6>
+
+# 获取配置的 URL 路径前缀
+# 实际客户端获取配置路径样例: http://localhost:8080/r/configs/pull/:appName/:appEnv
+setaria.pull.config.url = http://localhost:8080/r/configs/pull <7>
+----
+<1> 系统默认用户邮箱, 该用户邮箱无法通过 Console 控制台删除 (默认密码 `root`)
+<2> MySQL 数据库连接, 根据自己当前环境配置
+<3> MySQL 用户名
+<4> MySQL 密码
+<5> ZooKeeper 连接字符串, 根据息当前环境配置
+<6> Setaria 分布式配置存储在 ZooKeeper 中的根节点名称, 客户端的 `setaria.config.zookeeper.basePath` 参数必须与该参数值对应
+<7> Setaria 存储在 ZooKeeper 中获取配置的连接地址, 必须是 HTTP 的绝对路径, 客户端通过 ZooKeeper 获取该 URL 之后通过该 URL 获取配置参数, 根据自己当前的环境配置该 URL 前缀. 注: `/r/configs/pull` 是不变的.
+
+. 启动应用
+
+  现在你只需要将 `setaria-console` 发布至 Servlet 容器中并启动, 即可登录后台管理应用及配置参数了.
++
+NOTE: Setaria 使用 Flywaydb 做数据库脚本版本管理, 你只需创建数据库即可. 在启动应用的时候会自动创建数据表结构及初始化基础数据信息.
+
+=== Console Web 管理配置
+
+在浏览器中输入 `setaria-console` 的访问 URL. 如: http://127.0.0.1:8080/.
+
+.登录
+image:login.png[] 默认用户名/密码 `root@weghst.com/root`.
+
+.添加用户
+image:user_add_1.png[]
+
+Setaria 提供2种用户类型, 管理员拥有所有 Console 操作权限, 普通用户只可管理属于自己的应用配置.
+
+.用户列表
+image:user_list_2.png[]
+
+用户列表可以编辑/删除用户信息.
+
+.添加应用
+image:app_add_1.png[]
+
+在同一个应用名称下只能有一种应用环境, 应用名称加环境组成唯一值.
+
+.应用列表
+image:app_list_2.png[]
+
+应用列表可以编辑/删除应用信息.
+
+WARNING: 删除应用的同时会删除应用下所有的配置信息.
+
+.查看应用客户端连接信息
+image:app_list_4.png[]
+
+点击应用 ID 可看应用客户端连接信息.
+
+image:app_client_infos_1.png[]
+
+.应用配置列表
+image:app_list_3.png[]
+
+点击应用名称可进入应用配置列表
+
+image:config_list_1.png[]
+
+NOTE: 配置列表右上角可导入/导出当前配置信息, 导入时会根据配置键自动匹配现有配置, 如果键已经存在则会覆盖反之则会增加配置.
+
+.添加配置
+image:config_add_1.png[]
+
+.修改配置信息
+image:config_update_1.png[]
+
+== 结束
+大家在使用 setaria 时有任何问题/建议可通过 https://github.com/weghst/setaria[GitHub] 提交或者发我邮箱 `kevinz@weghst.com`, 在下一定会在第一时间回应.
+
+感谢!!!
