@@ -1,10 +1,13 @@
-:toc:
+:toc: left
 :toc-title: 目录
 :source-highlighter: coderay
 :imagesdir: images
 
 
 = Setaria 使用手册
+
+Setaria 一套简单的配置管理 API, 可支持文件, 分布式配置实现, 同时支持配置热加载.
+
 在一个项目中参数配置是非常基本也是非常重要的部分, 我们的项目都有各自的实现对配置的处理方式, Setaria 期望能统一配置实现标准. Setaria 支持不同格式的文件配置, 同时会监听文件在变化, 在应用运行时无需重启应用, Setaria 会自动重载配置至内存中. Setaria 也支持分布式配置管理并提供一套配置管理后台应用程序用于运维/开发人员方便的管理分布式配置, 在控制台程序中也可监控客户机的配置状态.
 
 == Client API 使用
