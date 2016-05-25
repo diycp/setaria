@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,6 +52,7 @@ public class JsonSetariaConfig extends AbstractWatchedSetariaConfig {
         return properties;
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     protected void doRefresh() {
         Set<ConfigBean> configBeanSet = new HashSet<>();
@@ -65,11 +66,14 @@ public class JsonSetariaConfig extends AbstractWatchedSetariaConfig {
                 ConfigBean[] configBeanArray = ObjectMapperUtils.readValue(file, ConfigBean[].class);
 
                 configBeanSet.addAll(Arrays.asList(configBeanArray));
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 if (resource.isIgnoreNotFound()) {
                     LOG.info("文件 [{}] 不存在, 已忽略", resource.getLocation());
                 } else {
-                    throw new SetariaConfigException(e);
+                    if (e instanceof FileNotFoundException) {
+                        throw new SetariaConfigException("未发现配置文件 [" + resource.getLocation() + "]", e);
+                    }
+                    throw new SetariaConfigException("加载配置文件 [" + resource.getLocation() + "] 错误", e);
                 }
             }
         }
