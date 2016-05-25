@@ -1,5 +1,6 @@
 :toc:
 :toc-title: 目录
+:source-highlighter: coderay
 :imagesdir: images
 
 
@@ -182,7 +183,7 @@ Configs.getBigInteger(String key, String defaultValue);
 private String first;
 ----
 
-`@org.springframework.beans.factory.annotation.Value` 通过 Spring 原生的配置注解获取配置属性值, `@Value` 与 `@ConfigValue` 唯一的区别是 `@Value` Setaria 不会在运行时*自动更新*配置属性值.
+`@org.springframework.beans.factory.annotation.Value` 通过 Spring 原生的配置注解获取配置属性值, `@Value` 与 `@ConfigValue` 唯一的区别是 `@Value` Setaria 不会在运行时 *自动更新* 配置属性值.
 
 [source,java]
 ----
@@ -293,52 +294,63 @@ NOTE: Setaria 使用 Flywaydb 做数据库脚本版本管理, 你只需创建数
 
 在浏览器中输入 `setaria-console` 的访问 URL. 如: http://127.0.0.1:8080/.
 
-.登录
-image:login.png[] 默认用户名/密码 `root@weghst.com/root`.
+. 登录
++
+image:login.png[width=800]
++
+默认用户名/密码 `root@weghst.com/root`.
 
-.添加用户
-image:user_add_1.png[]
-
+. 添加用户
++
+image:user_add_1.png[width=800]
++
 Setaria 提供2种用户类型, 管理员拥有所有 Console 操作权限, 普通用户只可管理属于自己的应用配置.
 
-.用户列表
-image:user_list_2.png[]
-
+. 用户列表
++
+image:user_list_2.png[width=800]
++
 用户列表可以编辑/删除用户信息.
 
-.添加应用
-image:app_add_1.png[]
-
+. 添加应用
++
+image:app_add_1.png[width=800]
++
 在同一个应用名称下只能有一种应用环境, 应用名称加环境组成唯一值.
 
-.应用列表
-image:app_list_2.png[]
-
+. 应用列表
++
+image:app_list_2.png[width=800]
++
 应用列表可以编辑/删除应用信息.
-
++
 WARNING: 删除应用的同时会删除应用下所有的配置信息.
 
-.查看应用客户端连接信息
-image:app_list_4.png[]
-
+. 查看应用客户端连接信息
++
+image:app_list_4.png[width=800]
++
 点击应用 ID 可看应用客户端连接信息.
++
+image:app_client_infos_1.png[width=800]
 
-image:app_client_infos_1.png[]
-
-.应用配置列表
-image:app_list_3.png[]
-
+. 应用配置列表
++
+image:app_list_3.png[width=800]
++
 点击应用名称可进入应用配置列表
-
-image:config_list_1.png[]
-
++
+image:config_list_1.png[width=800]
++
 NOTE: 配置列表右上角可导入/导出当前配置信息, 导入时会根据配置键自动匹配现有配置, 如果键已经存在则会覆盖反之则会增加配置.
 
-.添加配置
-image:config_add_1.png[]
+. 添加配置
++
+image:config_add_1.png[width=800]
 
-.修改配置信息
-image:config_update_1.png[]
+. 修改配置信息
++
+image:config_update_1.png[width=800]
 
 == 结束
 大家在使用 setaria 时有任何问题/建议可通过 https://github.com/weghst/setaria[GitHub] 提交或者发我邮箱 `kevinz@weghst.com`, 在下一定会在第一时间回应.
