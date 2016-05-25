@@ -18,14 +18,14 @@ Setaria 一套简单的配置管理 API, 可支持文件, 分布式配置实现,
 <dependency>
   <groupId>com.weghst.setaria</groupId>
   <artifactId>setaria-client</artifactId>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
 </dependency>
 ----
 
 .Gradle
 [source,groovy]
 ----
-compile 'com.weghst.setaria:setaria-client:1.1.0'
+compile 'com.weghst.setaria:setaria-client:1.2.0'
 ----
 
 === 纯编码的使用方式

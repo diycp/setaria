@@ -130,7 +130,6 @@ class ConfigValueBeanPostProcessor implements BeanPostProcessor, PriorityOrdered
             // 配置更新完成后自动刷新 Spring 所管理的 Bean 对象
             if (event == Event.AFTER_REFRESH) {
                 for (String beanName : beanFactory.getBeanDefinitionNames()) {
-//                    beanFactory.getBean(beanName);
                     doPostProcessInitialization(beanFactory.getBean(beanName));
                 }
             }

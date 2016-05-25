@@ -27,7 +27,7 @@ import com.weghst.setaria.client.spring.ConfigValueBeanFactoryPostProcessor;
  */
 @Configuration
 @ComponentScan("com.weghst.setaria")
-@ImportResource("classpath:spring-clien-test.xml")
+@ImportResource("classpath:spring-client-test.xml")
 public class SpringConfigurer {
 
     @Bean

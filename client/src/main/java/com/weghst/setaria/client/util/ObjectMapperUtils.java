@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2016 The Weghst Inc. <kevinz@weghst.com>
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@ package com.weghst.setaria.client.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +42,7 @@ public final class ObjectMapperUtils {
     }
 
     /**
-     * {@link ObjectMapper#readValue(byte[], Class)}
+     * {@link ObjectMapper#readValue(byte[], Class)}.
      *
      * @param content   JSON 字节数组
      * @param valueType 数据类型
@@ -59,26 +58,14 @@ public final class ObjectMapperUtils {
     }
 
     /**
-     * @param src
-     * @param valueType
-     * @param <T>
-     * @return
+     * {@link ObjectMapper#readValue(File, Class)}.
+     *
+     * @param src       文件
+     * @param valueType 数据类型
+     * @param <T>       数据类型
+     * @return 数据对象
      */
     public static <T> T readValue(File src, Class<T> valueType) {
-        try {
-            return OBJECT_MAPPER.readValue(src, valueType);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * @param src
-     * @param valueType
-     * @param <T>
-     * @return
-     */
-    public static <T> T readValue(InputStream src, Class<T> valueType) {
         try {
             return OBJECT_MAPPER.readValue(src, valueType);
         } catch (IOException e) {
